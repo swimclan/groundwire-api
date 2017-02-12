@@ -54,6 +54,19 @@ router.get('/positions', function(req, res, next) {
 	});
 });
 
+/* GET queued orders */
+router.get('/queue', function(req, res, next) {
+	console.log("Getting orders");
+	trade.findQueuedOrdersByInstrument()
+	.then(function(orders) {
+		utils.sendJSONResponse(200, res, orders);
+	})
+	.catch(function(err) {
+		console.log(err);
+		utils.sendJSONResponse(500, res, { error: err });
+	});
+});
+
 /* GET ticker price */
 router.get('/price/:ticker', function(req, res, next) {
 	if (!trade.validAPIKey(req)) return utils.sendJSONResponse(401, res, { error: "Unauthorized: Invalid or no API key provided" });
@@ -134,6 +147,23 @@ router.post('/buy', bodyParser.json(), function(req, res, next) {
 	.catch(function(err){
 		console.log(err);
 		utils.sendJSONResponse(500, res, { error: err });
+	});
+});
+
+/* DELETE cancel queued stop sell */
+router.delete('/cancel', function(req, res, next) {
+	var reqBody = req.body;
+	if (Object.keys(reqBody).indexOf("instrumentId") === -1) {
+		console.log("Error: An instrument ID was not found in request");
+		return utils.sendJSONResponse(400, res, { error: "Error: An instrument ID was not found in request" });
+	}
+	trade.cancelQueuedStopSell(reqBody.instrumentId)
+	.then(function(cancelledOrder) {
+		return utils.sendJSONResponse(200, res, cancelledOrder);
+	})
+	.catch(function(err) {
+		console.log(err);
+		return utils.sendJSONResponse(500, res, { error: err });
 	});
 });
 
