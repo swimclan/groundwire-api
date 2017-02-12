@@ -94,9 +94,13 @@ router.get('/watchlist', function(req, res, next) {
 });
 
 /* POST place buy order  */
-router.post('/buy', bodyParser.json(), function(req, res, next) {
+router.post('/trade', bodyParser.json(), function(req, res, next) {
+	console.log("Lets trade!");
 	if (!trade.validAPIKey(req)) return utils.sendJSONResponse(401, res, { error: "Unauthorized: Invalid or no API key provided" });
 	var reqBody = req.body;
+	if (!reqBody.type) { 
+		return utils.sendJSONResponse(400, res, { error: { message: "Must specify a trade type" } });
+	} 
 	if (Object.keys(reqBody).indexOf("quantity") === -1) {
 		return utils.sendJSONResponse(400, res, { error: { message: "Must specify a quantity" } });
 	} 
@@ -112,32 +116,34 @@ router.post('/buy', bodyParser.json(), function(req, res, next) {
 		var instQuery = reqBody.instrumentId;
 		var quantity = reqBody.quantity;
 	}
+	var orderType = reqBody.type;
+	var tradeMethod = orderType === "buy" ? trade.placeBuy : trade.placeSell;
+	var stopPrice = null;
+	if (orderType !== 'buy' && !req.body.stop_price) {
+		return utils.sendJSONResponse(400, res, { error: { message: "Sell orders must include a stop loss price" } });
+	} else {
+		stopPrice = req.body.stop_price;
+	}
 	var instrumentQueryMethod = instQueryType === 'symbol' ? trade.getInstrumentFromTicker : trade.getInstrumentFromUrl
 	instrumentQueryMethod(instQuery)
 	.then(function(inst) {
 		trade.getPrice(inst.symbol)
 		.then(function(data) {
-			console.log(`Price data for ${inst.symbol} is: `);
-			console.log(data);
-		    var options = {
-		        type: 'market',
-		        trigger: "immediate",
-		        time_in_force: "gfd",
-		        bid_price: data.last_trade_price,
-		        quantity: quantity,
-		        instrument: {
-		            url: inst.url,
-		            symbol: inst.symbol
-		        }
-		    }
-		    trade.placeBuy(options)
-		    .then(function(buy) {
-		    	utils.sendJSONResponse(200, res, buy);
-		    })
-		    .catch(function(err) {
-		    	console.log(err);
-		    	utils.sendJSONResponse(500, res, { error: err })
-		    });
+			trade.buildOrderOptions(inst.url, quantity, data.last_trade_price, stopPrice ? { price: stopPrice } : null)
+			.then(function(options) {
+			    tradeMethod(options)
+			    .then(function(buy) {
+			    	utils.sendJSONResponse(200, res, buy);
+			    })
+			    .catch(function(err) {
+			    	console.log(err);
+			    	utils.sendJSONResponse(500, res, { error: err })
+			    });
+			})
+			.catch(function(err) {
+				console.log(err);
+				utils.sendJSONResponse(500, res, { error: err });
+			});
 		})
 		.catch(function(err) {
 			console.log(err);
