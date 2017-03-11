@@ -7,7 +7,7 @@ var utils = require('../lib/utils');
 /* ROUTES */
 /* GET investor profile */
 router.get('/', function(req, res, next) {
-	if (!trade.validAPIKey(req)) return utils.sendJSONResponse(401, res, { error: "Unauthorized: Invalid or no API key provided" });
+	utils.secure(req, res);
 	console.log("Getting investor profile");
 	trade.getProfile()
 	.then(function(profile) {
@@ -20,6 +20,7 @@ router.get('/', function(req, res, next) {
 
 /* GET user profile */
 router.get('/user', function(req, res, next) {
+	utils.secure(req, res);
 	console.log("Getting user profile");
 	trade.getUser()
 	.then(function(user) {
@@ -32,6 +33,7 @@ router.get('/user', function(req, res, next) {
 
 /* GET user account */
 router.get('/accounts', function(req, res, next) {
+	utils.secure(req, res);
 	console.log("Getting user account");
 	trade.getAccounts()
 	.then(function(account) {
@@ -44,6 +46,7 @@ router.get('/accounts', function(req, res, next) {
 
 /* GET positions */
 router.get('/positions', function(req, res, next) {
+	utils.secure(req, res);
 	console.log("getting positions");
 	trade.getPositions()
 	.then(function(positions) {
@@ -56,6 +59,7 @@ router.get('/positions', function(req, res, next) {
 
 /* GET queued orders */
 router.get('/queue', function(req, res, next) {
+	utils.secure(req, res);
 	console.log("Getting orders");
 	trade.findQueuedOrdersByInstrument()
 	.then(function(orders) {
@@ -69,7 +73,7 @@ router.get('/queue', function(req, res, next) {
 
 /* GET ticker price */
 router.get('/price/:ticker', function(req, res, next) {
-	if (!trade.validAPIKey(req)) return utils.sendJSONResponse(401, res, { error: "Unauthorized: Invalid or no API key provided" });
+	utils.secure(req, res);
 	var ticker = req.params.ticker;
 	console.log(`Getting price data for: ${ticker} `);
 	trade.getPrice(ticker)
@@ -83,6 +87,7 @@ router.get('/price/:ticker', function(req, res, next) {
 
 /* GET watchlists */
 router.get('/watchlist', function(req, res, next) {
+	utils.secure(req, res);
 	trade.getWatchList()
 	.then(function(watchlist) {
 		console.log(watchlist);
@@ -95,8 +100,7 @@ router.get('/watchlist', function(req, res, next) {
 
 /* POST place buy order  */
 router.post('/trade', bodyParser.json(), function(req, res, next) {
-	console.log("Lets trade!");
-	if (!trade.validAPIKey(req)) return utils.sendJSONResponse(401, res, { error: "Unauthorized: Invalid or no API key provided" });
+	utils.secure(req, res);
 	var reqBody = req.body;
 	if (!reqBody.type) { 
 		return utils.sendJSONResponse(400, res, { error: { message: "Must specify a trade type" } });
@@ -158,6 +162,7 @@ router.post('/trade', bodyParser.json(), function(req, res, next) {
 
 /* DELETE cancel queued stop sell */
 router.delete('/cancel', function(req, res, next) {
+	utils.secure(req, res);
 	var reqBody = req.body;
 	if (Object.keys(reqBody).indexOf("instrumentId") === -1) {
 		console.log("Error: An instrument ID was not found in request");
