@@ -5,14 +5,16 @@ This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns
 The API's service root is at `/api/` and will run the expressJS app on port 80.  Currently there is no support for SSL but that will be coming in future release.
 
 ## Methods
-| URI                     | HTTP Verb  | Description                            |
-| ----------------------- | ---------- | -------------------------------------- |
-| `/api/`                 | GET        | Return RH account info for user        |
-| `/api/user`             | GET        | Return RH user info                    |
-| `/api/accounts`         | GET        | Return user's RH account(s) status(es) |
-| `/api/positions`        | GET        | Return user's current RH positions     |
-| `/api/queue`            | GET        | Return user's pending orders           |
-| `/api/price/<ticker>`   | GET        | Return instrument price by ticker symbol |
+| URI                     | HTTP Verb  | Request Body               | Description                                              |
+| ----------------------- | ---------- | -------------------------- | -------------------------------------------------------- |
+| `/api/`                 | GET        | None                       | Return RH account setup info for user                    |
+| `/api/user`             | GET        | None                       | Return RH user information                               |
+| `/api/accounts`         | GET        | None                       | Return user's RH account(s) status(es) including account balance |
+| `/api/positions`        | GET        | None                       | Return user's current RH positions                       |
+| `/api/queue`            | GET        | None                       | Return user's pending orders                             |
+| `/api/price/<ticker>`   | GET        | None                       | Return instrument price by ticker symbol                 |
+| `/api/watchlist`        | GET        | None                       | Return all instruments on the user's watchlist           |
+| `/api/trade`            | POST       | (1) symbol [optional ticker symbol], (2) instrumentId [optional RH instrument ID], (3) quantity [integer], (4) type [buy/sell] | Execute either a buy or sell trade.  Buy trades will all be market orders and sell trades will all be stops. |
 
 ***
 
