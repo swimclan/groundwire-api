@@ -14,23 +14,10 @@ The API's service root is at `/api/` and will run the expressJS app on port 80. 
 | `/api/queue`            | GET        | Return user's pending orders           |
 | `/api/price/<ticker>`   | GET        | Return instrument price by ticker symbol |
 
-## Security
+---
 
-### API Key
-API key is required on calls to all API methods.  A `key=<value>` parameter must be included on the query string of all requests to the API:
-
-`http://<server host>/api/<method>?key=<api key>`
-
-### RH Account Credentials
-A `credentials.js` file must exist in the application root directory and is a simple exported JS object with the username and password of the target RH account:
-
-```js
-module.exports = {
-    username: "myusername",
-    password: "mypassword"
-};
-```
 ## Sample Response
+Here is a sample JSON response that is returned from the GET `/api/price/<ticker>` method:
 ```js
 {
   "ask_price": "139.1300",
@@ -49,5 +36,35 @@ module.exports = {
   "instrument": "https://api.robinhood.com/instruments/450dfc6d-5510-4d40-abfb-f633b7d9be3e/"
 }
 ```
+---
 
+## Security
 
+### API Key
+API key is required on calls to all API methods.  A `key=<value>` parameter must be included on the query string of all requests to the API:
+
+`http://<server host>/api/<method>?key=<api key>`
+
+### API Key Definitions
+API keys are defined in the `.env` environment config file that is required in the root of the application.  It must be included in the application in order for the API to function.  Here is an example `.env` that contains the API keys definition:
+
+```
+PORT=80
+API_KEYS='["87wef87hwef87hwef","98wef9h8we9hwewef8","8932h4gfi9uwhdgf98s"]'
+```
+
+Note that the `API_KEYS` data is a simple JSON string that gets read and parsed by the application to verify keys.  
+
+### RH Account Credentials
+A `credentials.js` file must exist in the application root directory and is a simple exported JS object with the username and password of the target RH account:
+
+```js
+module.exports = {
+    username: "myusername",
+    password: "mypassword"
+};
+```
+
+---
+
+## Installing Locally
