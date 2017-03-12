@@ -78,7 +78,7 @@ To install and run this API application locally on your development machine you 
 * NPM version 4.x and above
 
 ### Security and Environment Files
-* A `credentials.js` file in the root of the application directory (see above [Security] secitonfor more details)
+* A `credentials.js` file in the root of the application directory (see above [Security] section for more details)
 * A `.env` file in the root of the application folder that contains to port number to run the application and the API keys definition (see above in [Security] section for more info)
 
 ### Steps
