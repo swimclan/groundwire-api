@@ -14,8 +14,8 @@ The API's service root is at `/api/` and will run the expressJS app on port 80. 
 | `/api/queue`            | GET        | None                       | Return user's pending orders                             |
 | `/api/price/<ticker>`   | GET        | None                       | Return instrument price by ticker symbol                 |
 | `/api/watchlist`        | GET        | None                       | Return all instruments on the user's watchlist           |
-| `/api/trade`            | POST       | (1) `symbol` [optional ticker symbol]<br>(2) `instrumentId` [optional RH instrument ID]<br>(3) `quantity` [integer]<br>(4) `type` [buy/sell] | Execute either a buy or sell trade.  Buy trades will all be market orders and sell trades will all be stops. |
-| `/api/cancel`           | DELETE     | (1) `instrumentId` [RH instrument ID] | Cancel any pending stop sell order that is in the queue.  To be used to move a stop loss position. |
+| `/api/trade`            | POST       | * `symbol` [optional ticker symbol]<br>* `instrumentId` [optional RH instrument ID]<br>* `quantity` [integer]<br>* `type` [buy/sell] | Execute either a buy or sell trade.  Buy trades will all be market orders and sell trades will all be stops. |
+| `/api/cancel`           | DELETE     | * `instrumentId` [RH instrument ID] | Cancel any pending stop sell order that is in the queue.  To be used to move a stop loss position. |
 ***
 
 ## Sample Response
