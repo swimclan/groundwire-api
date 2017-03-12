@@ -14,7 +14,7 @@ The API's service root is at `/api/` and will run the expressJS app on port 80. 
 | `/api/queue`            | GET        | Return user's pending orders           |
 | `/api/price/<ticker>`   | GET        | Return instrument price by ticker symbol |
 
----
+***
 
 ## Sample Response
 Here is a sample JSON response that is returned from the GET `/api/price/<ticker>` method:
@@ -36,7 +36,7 @@ Here is a sample JSON response that is returned from the GET `/api/price/<ticker
   "instrument": "https://api.robinhood.com/instruments/450dfc6d-5510-4d40-abfb-f633b7d9be3e/"
 }
 ```
----
+***
 
 ## Security
 
@@ -65,6 +65,6 @@ module.exports = {
 };
 ```
 
----
+***
 
 ## Installing Locally
