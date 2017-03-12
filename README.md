@@ -70,3 +70,20 @@ module.exports = {
 ***
 
 ## Installing Locally
+
+To install and run this API application locally on your development machine you simply need to clone down the repository and run the NodeJS application with access to the internet.
+
+### System Requirements
+* NodeJS version 6.x and above
+* NPM version 4.x and above
+
+### Security and Environment Files
+* A `credentials.js` file in the root of the application directory (see above [Security] secitonfor more details)
+* A `.env` file in the root of the application folder that contains to port number to run the application and the API keys definition (see above in [Security] section for more info)
+
+### Steps
+1. Clone this repository to your local working directory
+2. Run `npm install` from the newly cloned application directory
+3. Run `sudo npm start` and enter your computer credentials with admin privileges.  Sudo is required to run the app on port 80.
+4. Done!  Start querying the endpoints from your favorite tool.  Remember to put one of the API keys you have defined in your `.env` file
+
