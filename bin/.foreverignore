@@ -1,0 +1,9 @@
+**/.idea/**
+**/.git/**
+
+**/.tmp/**
+**/views/**
+**/assets/**
+
+# Restart only when js files are changed.
+!*.js
