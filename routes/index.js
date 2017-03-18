@@ -1,15 +1,23 @@
+'use strict';
+
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var trade = require('../lib/trading');
 var utils = require('../lib/utils');
 
+/* MIDDLEWARE */
+let bindUser = function(req, res, next) {
+	req.user = utils.authenticatedUser(req);
+	next();
+}
+
 /* ROUTES */
 /* GET investor profile */
-router.get('/', function(req, res, next) {
+router.get('/', bindUser, function(req, res, next) {
 	utils.secure(req, res);
 	console.log("Getting investor profile");
-	trade.getProfile()
+	trade.getProfile(req.user)
 	.then(function(profile) {
 		utils.sendJSONResponse(200, res, profile);
 	})
@@ -19,10 +27,10 @@ router.get('/', function(req, res, next) {
 });
 
 /* GET user profile */
-router.get('/user', function(req, res, next) {
+router.get('/user', bindUser, function(req, res, next) {
 	utils.secure(req, res);
 	console.log("Getting user profile");
-	trade.getUser()
+	trade.getUser(req.user)
 	.then(function(user) {
 		utils.sendJSONResponse(200, res, user);
 	})
@@ -31,16 +39,11 @@ router.get('/user', function(req, res, next) {
 	});
 });
 
-/* DEBUG Environment */
-// router.get('/env', function(req, res, next) {
-// 	utils.sendJSONResponse(200, res, process.env);
-// });
-
 /* GET user account */
-router.get('/accounts', function(req, res, next) {
+router.get('/accounts', bindUser, function(req, res, next) {
 	utils.secure(req, res);
 	console.log("Getting user account");
-	trade.getAccounts()
+	trade.getAccounts(req.user)
 	.then(function(account) {
 		utils.sendJSONResponse(200, res, account);
 	})
@@ -50,10 +53,9 @@ router.get('/accounts', function(req, res, next) {
 });
 
 /* GET positions */
-router.get('/positions', function(req, res, next) {
+router.get('/positions', bindUser, function(req, res, next) {
 	utils.secure(req, res);
-	console.log("getting positions");
-	trade.getPositions()
+	trade.getPositions(req.user)
 	.then(function(positions) {
 		utils.sendJSONResponse(200, res, positions);
 	})
@@ -63,10 +65,10 @@ router.get('/positions', function(req, res, next) {
 });
 
 /* GET queued orders */
-router.get('/queue', function(req, res, next) {
+router.get('/queue', bindUser, function(req, res, next) {
 	utils.secure(req, res);
 	console.log("Getting orders");
-	trade.findQueuedOrdersByInstrument()
+	trade.findQueuedOrdersByInstrument(req.user)
 	.then(function(orders) {
 		utils.sendJSONResponse(200, res, orders);
 	})
@@ -77,11 +79,11 @@ router.get('/queue', function(req, res, next) {
 });
 
 /* GET ticker price */
-router.get('/price/:ticker', function(req, res, next) {
+router.get('/price/:ticker', bindUser, function(req, res, next) {
 	utils.secure(req, res);
 	var ticker = req.params.ticker;
 	console.log(`Getting price data for: ${ticker} `);
-	trade.getPrice(ticker)
+	trade.getPrice(req.user, ticker)
  	.then(function(data) {
  		utils.sendJSONResponse(200, res, data);	
 	})
@@ -91,9 +93,9 @@ router.get('/price/:ticker', function(req, res, next) {
 });
 
 /* GET watchlists */
-router.get('/watchlist', function(req, res, next) {
+router.get('/watchlist', bindUser, function(req, res, next) {
 	utils.secure(req, res);
-	trade.getWatchList()
+	trade.getWatchList(req.user)
 	.then(function(watchlist) {
 		console.log(watchlist);
 		utils.sendJSONResponse(200, res, watchlist);
@@ -104,7 +106,7 @@ router.get('/watchlist', function(req, res, next) {
 });
 
 /* POST place buy order  */
-router.post('/trade', bodyParser.json(), function(req, res, next) {
+router.post('/trade', bindUser, function(req, res, next) {
 	utils.secure(req, res);
 	var reqBody = req.body;
 	if (!reqBody.type) { 
@@ -136,9 +138,9 @@ router.post('/trade', bodyParser.json(), function(req, res, next) {
 	var instrumentQueryMethod = instQueryType === 'symbol' ? trade.getInstrumentFromTicker : trade.getInstrumentFromUrl
 	instrumentQueryMethod(instQuery)
 	.then(function(inst) {
-		trade.getPrice(inst.symbol)
+		trade.getPrice(req.user, inst.symbol)
 		.then(function(data) {
-			trade.buildOrderOptions(inst.url, quantity, data.last_trade_price, stopPrice ? { price: stopPrice } : null)
+			trade.buildOrderOptions(req.user, inst.url, quantity, data.last_trade_price, stopPrice ? { price: stopPrice } : null)
 			.then(function(options) {
 			    tradeMethod(options)
 			    .then(function(buy) {
@@ -166,14 +168,14 @@ router.post('/trade', bodyParser.json(), function(req, res, next) {
 });
 
 /* DELETE cancel queued stop sell */
-router.delete('/cancel', function(req, res, next) {
+router.delete('/cancel', bindUser, function(req, res, next) {
 	utils.secure(req, res);
 	var reqBody = req.body;
 	if (Object.keys(reqBody).indexOf("instrumentId") === -1) {
 		console.log("Error: An instrument ID was not found in request");
 		return utils.sendJSONResponse(400, res, { error: "Error: An instrument ID was not found in request" });
 	}
-	trade.cancelQueuedStopSell(reqBody.instrumentId)
+	trade.cancelQueuedStopSell(req.user, reqBody.instrumentId)
 	.then(function(cancelledOrder) {
 		return utils.sendJSONResponse(200, res, cancelledOrder);
 	})
@@ -181,6 +183,15 @@ router.delete('/cancel', function(req, res, next) {
 		console.log(err);
 		return utils.sendJSONResponse(500, res, { error: err });
 	});
+});
+
+router.get('/auth', bindUser, function(req, res, next) {
+	let checkUser = utils.authenticatedUser(req);
+	if (checkUser) {
+		utils.sendJSONResponse(200, res, checkUser);
+	} else {
+		utils.sendJSONResponse(400, res, { error: { message: "No authenticated user was send in the request" } });
+	}
 });
 
 module.exports = router;
