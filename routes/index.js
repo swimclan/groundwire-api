@@ -32,9 +32,9 @@ router.get('/user', function(req, res, next) {
 });
 
 /* DEBUG Environment */
-router.get('/env', function(req, res, next) {
-	utils.sendJSONResponse(200, res, process.env);
-});
+// router.get('/env', function(req, res, next) {
+// 	utils.sendJSONResponse(200, res, process.env);
+// });
 
 /* GET user account */
 router.get('/accounts', function(req, res, next) {
