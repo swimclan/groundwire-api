@@ -136,13 +136,13 @@ router.post('/trade', bindUser, function(req, res, next) {
 		stopPrice = req.body.stop_price;
 	}
 	var instrumentQueryMethod = instQueryType === 'symbol' ? trade.getInstrumentFromTicker : trade.getInstrumentFromUrl
-	instrumentQueryMethod(instQuery)
+	instrumentQueryMethod(req.user, instQuery)
 	.then(function(inst) {
 		trade.getPrice(req.user, inst.symbol)
 		.then(function(data) {
 			trade.buildOrderOptions(req.user, inst.url, quantity, data.last_trade_price, stopPrice ? { price: stopPrice } : null)
 			.then(function(options) {
-			    tradeMethod(options)
+			    tradeMethod(req.user, options)
 			    .then(function(buy) {
 			    	utils.sendJSONResponse(200, res, buy);
 			    })
