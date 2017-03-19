@@ -54,24 +54,34 @@ API key is required on calls to all API methods.  A `key=<value>` parameter must
 
 `http://<server host>/api/<method>?key=<api key>`
 
+Make sure to obtain a key from application admin if using the API on production.
+
 ### API Key Definitions
-API keys are defined in the `.env` environment config file that is required in the root of the application.  It must be included in the application in order for the API to function.  Here is an example `.env` that contains the API keys definition:
+API keys are defined in the `.env` environment config file that is required in the root of the application when running locally.  It must be included in the application in order for the API to function in your dev environment.  Here is an example `.env` that contains the API keys definition:
 
 ```
-PORT=80
-API_KEYS='["87wef87hwef87hwef","98wef9h8we9hwewef8","8932h4gfi9uwhdgf98s"]'
+API_KEYS=87wef87hwef87hwef,98wef9h8we9hwewef8,8932h4gfi9uwhdgf98s
 ```
+On production, the `API_KEYS` definition is specified in the startup script.  Please contact application admin for more information about production `API_KEYS` definition.
 
-Note that the `API_KEYS` data is a simple JSON string that gets read and parsed by the application to verify keys.  
+Note that the `API_KEYS` is definition is a simple comma-separated list of alpha-numeric strings.
 
 ### RH Account Credentials
-A `credentials.js` file must exist in the application root directory and is a simple exported JS object with the username and password of the target RH account:
+#### Credentials file
+A `credentials.js` file optionally may exist in the application root directory. This file is a simple exported JS object with the username and password of the target RH account.  Here is an example of the file:
 
 ```js
 module.exports = {
     username: "myusername",
     password: "mypassword"
 };
+```
+
+#### Authorization Header
+The `credentials.js` file is not required to target a specific account in Robinhood.  You may also send a base64 encoded username and password in the `Authorization` header of each API request.  The credentials must be sent as a single string concatenated with a `:` such as: `username:password`.  A sample of the header containing a base 64 encoded username and password looks like:
+
+```
+Authorization: Basic 298fhq3rg9h3=
 ```
 
 # Installing Locally
