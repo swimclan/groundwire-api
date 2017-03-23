@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 require('dotenv').config();
 
 var routes = require('./routes/index');
+var streams = require('./streams/index');
 
 var app = express();
 
@@ -24,6 +25,7 @@ app.use(require('less-middleware')(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', routes);
+app.use('/stream', streams);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

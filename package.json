@@ -17,7 +17,10 @@
     "less-middleware": "1.0.x",
     "lodash": "^4.17.4",
     "morgan": "~1.6.1",
+    "query-string": "^4.3.2",
+    "request": "^2.81.0",
     "robinhood": "^0.9.0",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "socket.io": "^1.7.3"
   }
 }
