@@ -194,4 +194,19 @@ router.get('/auth', bindUser, function(req, res, next) {
 	}
 });
 
+router.get('/queue/stop/:instrumentId', bindUser, function(req, res, next) {
+	utils.secure(req, res);
+	if (!req.params.instrumentId) {
+		console.log("error: must supply an instrumentId");
+		utils.sendJSONResponse(400, res, { error: "must supply an instrumentId" });
+	}
+	trade.findQueuedStopSellOrderByInstrument(req.user, req.params.instrumentId)
+	.then(function(stopOrder) {
+		utils.sendJSONResponse(200, res, stopOrder);
+	})
+	.catch(function(err) {
+		utils.sendJSONResponse(500, res, { error: err });
+	});
+});
+
 module.exports = router;

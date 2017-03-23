@@ -18,6 +18,7 @@ The API's service root is at `/api/` and will run the expressJS app on port 80. 
 | `/api/accounts`         | GET        | None                              | Return user's RH account(s) status(es) including account balance |
 | `/api/positions`        | GET        | None                              | Return user's current RH positions                       |
 | `/api/queue`            | GET        | None                              | Return user's pending orders                             |
+| `/api/queue/stop/<instrumentId>`| GET        | None                              | Return user's pending stop sell order for an instrumentId             |      
 | `/api/price/<ticker>`   | GET        | None                              | Return instrument price by ticker symbol                 |
 | `/api/watchlist`        | GET        | None                              | Return all instruments on the user's watchlist           |
 | `/api/trade`            | POST       | * `symbol` [optional ticker symbol]<br>* `instrumentId` [optional RH instrumentID]<br>* `quantity` [integer]<br>* `type` [buy/sell]<br>* `stop_price` [optional float] | Execute either a buy or sell trade.  Buy trades will all be market buy orders and sell trades will all be stop-loss sell orders.  If sending a stop loss sell order you must send in a `stop_price` value. |
