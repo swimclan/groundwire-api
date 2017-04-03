@@ -5,12 +5,13 @@ var intervals = {};
 module.exports = function(server, io) {
     var socketsServer = io.listen(server);
     socketsServer.sockets.on('connection', function(socket) {
-        console.log('Welcome to the GroundWire stock price stream');
+        var ticker = socket.handshake.query ? socket.handshake.query.ticker : "NULL";
+        socket.join(ticker);
         intervals.polling = setInterval(function() {
-            trade.getYahooPrice('GEVO')
+            trade.getYahooPrice(ticker)
             .then(function(data) {
                 console.log('Sending to client: $' + data.price + ' traded at ' + data.time);
-                socket.emit('price', data);
+                socketsServer.in(ticker).emit('price', data);
             })
             .catch(function(err){
                 console.log(error);
@@ -19,6 +20,6 @@ module.exports = function(server, io) {
         socket.on('disconnect', function() {
             clearInterval(intervals.polling);
             console.log('Thank you for using the GroundWire stock price stream');
-    });
+        });
     });
 }
