@@ -131,7 +131,9 @@ router.post('/trade', bindUser, function(req, res, next) {
 	var tradeMethod = orderType === "buy" ? trade.placeBuy : trade.placeSell;
 	var stopPrice = null;
 	if (orderType !== 'buy' && !req.body.stop_price) {
-		return utils.sendJSONResponse(400, res, { error: { message: "Sell orders must include a stop loss price" } });
+		//return utils.sendJSONResponse(400, res, { error: { message: "Sell orders must include a stop loss price" } });
+		console.log('Preparing a market sell order...');
+		stopPrice = null;
 	} else {
 		stopPrice = req.body.stop_price;
 	}
@@ -175,7 +177,25 @@ router.delete('/cancel', bindUser, function(req, res, next) {
 		console.log("Error: An instrument ID was not found in request");
 		return utils.sendJSONResponse(400, res, { error: "Error: An instrument ID was not found in request" });
 	}
-	trade.cancelQueuedStopSell(req.user, reqBody.instrumentId)
+	if (Object.keys(reqBody).indexOf("trigger") === -1) {
+		console.log("Error: A trigger type was not found in request");
+		return utils.sendJSONResponse(400, res, { error: "Error: A trigger type was not found in request" });
+	}
+
+	var cancelMethod;
+
+	switch (reqBody.trigger) {
+		case 'immediate':
+			cancelMethod = trade.cancelQueuedMarketSell.bind(trade);
+			break;
+		case 'stop':
+			cancelMethod = trade.cancelQueuedStopSell.bind(trade);
+			break;
+		default:
+			cancelMethod = trade.cancelQueuedMarketSell.bind(trade);
+	}
+
+	cancelMethod(req.user, reqBody.instrumentId)
 	.then(function(cancelledOrder) {
 		return utils.sendJSONResponse(200, res, cancelledOrder);
 	})
@@ -194,13 +214,15 @@ router.get('/auth', bindUser, function(req, res, next) {
 	}
 });
 
-router.get('/queue/stop/:instrumentId', bindUser, function(req, res, next) {
+router.get('/queue/:trigger/:instrumentId', bindUser, function(req, res, next) {
 	utils.secure(req, res);
+	var valid_triggers = ['stop', 'immediate'];
+	if (valid_triggers.indexOf(req.params.trigger) === -1) return utils.sendJSONResponse(400, res, { error: "trigger must me either stop or immediate" });
 	if (!req.params.instrumentId) {
 		console.log("error: must supply an instrumentId");
 		utils.sendJSONResponse(400, res, { error: "must supply an instrumentId" });
 	}
-	trade.findQueuedStopSellOrderByInstrument(req.user, req.params.instrumentId)
+	trade.findQueuedSellOrderByInstrument(req.user, req.params.instrumentId, req.params.trigger)
 	.then(function(stopOrder) {
 		utils.sendJSONResponse(200, res, stopOrder);
 	})

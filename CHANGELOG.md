@@ -9,3 +9,7 @@ Allow for multiple users to authenticate to Robinhood using basic HTTP header au
 ## v1.1.0
 ### Feature
 Improved performance of cancel call and added a new queue method to get single pending stop sell for an instrumentId
+
+## v1.1.5
+### Feature
+Added ability to make market sell orders that trigger immediately, to see market sell order in the queue and to cancel a market sell order

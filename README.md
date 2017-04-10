@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.1.0
+1.1.5
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -18,11 +18,12 @@ The API's service root is at `/api/` and will run the expressJS app on port 80. 
 | `/api/accounts`         | GET        | None                              | Return user's RH account(s) status(es) including account balance |
 | `/api/positions`        | GET        | None                              | Return user's current RH positions                       |
 | `/api/queue`            | GET        | None                              | Return user's pending orders                             |
-| `/api/queue/stop/<instrumentId>`| GET        | None                              | Return user's pending stop sell order for an instrumentId             |      
+| `/api/queue/stop/<instrumentId>`| GET        | None                              | Return user's pending stop sell order for an instrumentId             |
+| `/api/queue/immediate/<instrumentId>`| GET        | None                              | Return user's pending market sell order for an instrumentId             |     
 | `/api/price/<ticker>`   | GET        | None                              | Return instrument price by ticker symbol                 |
 | `/api/watchlist`        | GET        | None                              | Return all instruments on the user's watchlist           |
 | `/api/trade`            | POST       | * `symbol` [optional ticker symbol]<br>* `instrumentId` [optional RH instrumentID]<br>* `quantity` [integer]<br>* `type` [buy/sell]<br>* `stop_price` [optional float] | Execute either a buy or sell trade.  Buy trades will all be market buy orders and sell trades will all be stop-loss sell orders.  If sending a stop loss sell order you must send in a `stop_price` value. |
-| `/api/cancel`           | DELETE     | * `instrumentId` [RH instrumentID] | Cancel any pending stop sell order that is in the queue.  To be used to move a stop loss position. |
+| `/api/cancel`           | DELETE     | * `instrumentId` [RH instrumentID]<br>* `trigger` [stop/immediate] | Cancel any pending market (trigger `immediate`) or stop (trigger `stop`) sell order that is in the queue.  Can be used to move a stop loss position that is managed by RH. |
 
 ***
 
