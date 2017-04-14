@@ -108,7 +108,7 @@ On production, the `API_KEYS` definition is specified in the startup script.  Pl
 
 Note that the `API_KEYS` is definition is a simple comma-separated list of alpha-numeric strings.
 
-## RH Account Credentials
+## RH & Intrinio Account Credentials
 ### Credentials files
 A `robinhood.js` file optionally may exist in the `/credentials/` directory under root. This file is a simple exported JS object with the username and password of the target RH account.  Here is an example of the file:
 
