@@ -91,8 +91,10 @@ Connected to the Groundwire socket
 ## API Key
 API key is required on calls to all API methods and websocket.  A `key=<value>` parameter must be included on the query string of all requests to the API and websocket:
 
-API: `https://<server host>/api/<method>?key=**<api_key>**`
-Websocket: `https://<server host>/?ticker&key=**<api_key>**`
+| Endpoint Type | API Key Delivery                         |
+| --- | -------------------------------------------------- |
+| API | `https://<server host>/api/<method>?key=<api_key>` |
+| Websocket | `https://<server host>/?ticker&key=<api_key>` |
 
 Make sure to obtain a key from application admin if using the API on production.
 
