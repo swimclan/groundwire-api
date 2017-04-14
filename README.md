@@ -10,7 +10,21 @@ This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns
 ## Service Root URI
 The API's service root is at `/api/` and will run the expressJS app on port 80.  Currently there is no support for SSL but that will be coming in future release.
 
-## Methods
+## Websocket URI
+The API now supports a websocket connection to deliver realtime price quote data powered by Intrinio Realtime Exchange data.  Connect to the websocket at the root `/`.  User must send both a valid stock exchange ticker symbol and a valid API key (see 'API Key' below for more info).  
+
+Production websocket URL exmaple: `https://groundwire.co?ticker=<ticker>&key=<api_key>`
+
+Web socket will trigger a `quote` event with an object hash containing the following price data with every change in the market:
+
+| Key                     | Description                                                                                               |
+| ----------------------- | --------------------------------------------------------------------------------------------------------- |
+| `type`                  | One of three different price types: `ask`, `bid` or `last`                                                |
+| `timestamp`             | The epoch timestamp of when the price was observed on the market                                          |
+| `ticker`                | The ticker symbol of the stock instrument in question                                                     |
+| `size`                  | The volume of transactions that occured since the last tick                                               |
+
+## API Methods
 | URI                     | HTTP Verb  | Request Body                      | Description                                              |
 | ----------------------- | ---------- | --------------------------------- | -------------------------------------------------------- |
 | `/api/`                 | GET        | None                              | Return RH account setup info for user                    |
