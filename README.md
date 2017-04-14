@@ -25,9 +25,7 @@ The API's service root is at `/api/` and will run the expressJS app on port 80. 
 | `/api/trade`            | POST       | * `symbol` [optional ticker symbol]<br>* `instrumentId` [optional RH instrumentID]<br>* `quantity` [integer]<br>* `type` [buy/sell]<br>* `stop_price` [optional float] | Execute either a buy or sell trade.  Buy trades will all be market buy orders and sell trades will either be stop-loss or market sell orders depending on whether a `stop_price` value is sent in the request.  If sending a stop loss sell order you must send in a `stop_price` value. |
 | `/api/cancel`           | DELETE     | * `instrumentId` [RH instrumentID]<br>* `trigger` [stop/immediate] | Cancel any pending market (trigger `immediate`) or stop (trigger `stop`) sell order that is in the queue.  Can be used to move a stop loss position that is managed by RH. |
 
-***
-
-## Sample Response
+## Sample API Response
 Here is a sample JSON response that is returned from the GET `/api/price/<ticker>` method:
 ```js
 {
@@ -47,12 +45,16 @@ Here is a sample JSON response that is returned from the GET `/api/price/<ticker
   "instrument": "https://api.robinhood.com/instruments/450dfc6d-5510-4d40-abfb-f633b7d9be3e/"
 }
 ```
-***
+
+# Websocket
+The API now supports a websocket connection to deliver realtime price quote data powered by Intrinio Realtime Exchange data.  
 
 ## Websocket URI
-The API now supports a websocket connection to deliver realtime price quote data powered by Intrinio Realtime Exchange data.  Connect to the websocket at the root `/`.  User must send both a valid stock exchange ticker symbol and a valid API key (see 'API Key' below for more info).  
+Connect to the websocket at the root `/`.  User must send both a valid stock exchange ticker symbol and a valid API key (see 'API Key' below for more info).  
 
 Production websocket URL exmaple: `https://groundwire.co?ticker=<ticker>&key=<api_key>`
+
+## Websocket Events & Data
 
 Web socket will trigger a `quote` event with an object hash containing the following price data with every change in the market:
 
@@ -63,16 +65,37 @@ Web socket will trigger a `quote` event with an object hash containing the follo
 | `ticker`                | The ticker symbol of the stock instrument in question                                                     |
 | `size`                  | The volume of transactions that occured since the last tick                                               |
 
-## Security
+## Sample Response
+Here is a sample of a frame of data that will be returned from the websocket on the `quote` event:
+```sh
+Connected to the Groundwire socket
+{ type: 'ask',
+  timestamp: 1492113599.925394,
+  ticker: 'GOOG',
+  size: 100,
+  price: 823.7 }
+{ type: 'bid',
+  timestamp: 1492113595.844749,
+  ticker: 'GOOG',
+  size: 200,
+  price: 823.63 }
+{ type: 'last',
+  timestamp: 1492113592.6201143,
+  ticker: 'GOOG',
+  size: 33,
+  price: 824.07 }
+```
 
-### API Key
+# Security
+
+## API Key
 API key is required on calls to all API methods.  A `key=<value>` parameter must be included on the query string of all requests to the API:
 
 `http://<server host>/api/<method>?key=<api key>`
 
 Make sure to obtain a key from application admin if using the API on production.
 
-### API Key Definitions
+## API Key Definitions
 API keys are defined in the `.env` environment config file that is required in the root of the application when running locally.  It must be included in the application in order for the API to function in your dev environment.  Here is an example `.env` that contains the API keys definition:
 
 ```
@@ -82,8 +105,8 @@ On production, the `API_KEYS` definition is specified in the startup script.  Pl
 
 Note that the `API_KEYS` is definition is a simple comma-separated list of alpha-numeric strings.
 
-### RH Account Credentials
-#### Credentials file
+## RH Account Credentials
+### Credentials file
 A `credentials.js` file optionally may exist in the application root directory. This file is a simple exported JS object with the username and password of the target RH account.  Here is an example of the file:
 
 ```js
@@ -93,7 +116,7 @@ module.exports = {
 };
 ```
 
-#### Authorization Header
+### Authorization Header
 The `credentials.js` file is not required to target a specific account in Robinhood.  You may also send a base64 encoded username and password in the `Authorization` header of each API request.  The credentials must be sent as a single string concatenated with a `:` such as: `username:password`.  A sample of the header containing a base 64 encoded username and password looks like:
 
 ```
@@ -104,15 +127,15 @@ Authorization: Basic 298fhq3rg9h3=
 
 To install and run this API application locally on your development machine you simply need to clone down the repository and run the NodeJS application with access to the internet.
 
-### System Requirements
+## System Requirements
 * NodeJS version 6.x and above
 * NPM version 4.x and above
 
-### Security and Environment Files
+## Security and Environment Files
 * A `credentials.js` file in the root of the application directory (see above [Security] section for more details)
 * A `.env` file in the root of the application folder that contains to port number to run the application and the API keys definition (see above in [Security] section for more info)
 
-### Steps
+## Steps
 1. Clone this repository to your local working directory
 2. Run `npm install` from the newly cloned application directory
 3. Run `sudo npm start` and enter your computer credentials with admin privileges.  Sudo is required to run the app on port 80.
