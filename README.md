@@ -109,8 +109,8 @@ On production, the `API_KEYS` definition is specified in the startup script.  Pl
 Note that the `API_KEYS` is definition is a simple comma-separated list of alpha-numeric strings.
 
 ## RH Account Credentials
-### Credentials file
-A `credentials.js` file optionally may exist in the application root directory. This file is a simple exported JS object with the username and password of the target RH account.  Here is an example of the file:
+### Credentials files
+A `robinhood.js` file optionally may exist in the `/credentials/` directory under root. This file is a simple exported JS object with the username and password of the target RH account.  Here is an example of the file:
 
 ```js
 module.exports = {
@@ -118,6 +118,8 @@ module.exports = {
     password: "mypassword"
 };
 ```
+
+An `intrinio.js` file must exist in the `/credentials/` directory under root if the Websocket is to be used.  It is also a simple exported js object with the Intrinio username and password as seen above.  This credentials file must exist for the websocket to function.
 
 ### Authorization Header
 The `credentials.js` file is not required to target a specific account in Robinhood.  You may also send a base64 encoded username and password in the `Authorization` header of each API request.  The credentials must be sent as a single string concatenated with a `:` such as: `username:password`.  A sample of the header containing a base 64 encoded username and password looks like:
@@ -135,7 +137,8 @@ To install and run this API application locally on your development machine you 
 * NPM version 4.x and above
 
 ## Security and Environment Files
-* A `credentials.js` file in the root of the application directory (see above [Security] section for more details)
+* An optional `robinhood.js` file in the `/credentials/` directory (see above [Security] section for more details)
+* A required `intrinio.js` file in the `/credentials/` directory  if the websocket is to be functional
 * A `.env` file in the root of the application folder that contains to port number to run the application and the API keys definition (see above in [Security] section for more info)
 
 ## Steps
