@@ -1,4 +1,4 @@
 .env
-credentials.js
+credentials/**
 node_modules/
 npm-debug.log
