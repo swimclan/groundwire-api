@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.2.1
+1.3.0
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -18,6 +18,7 @@ The API's service root is at `/api/` and will run the expressJS app on port 80. 
 | `/api/accounts`         | GET        | None                              | Return user's RH account(s) status(es) including account balance |
 | `/api/positions`        | GET        | None                              | Return user's current RH positions                       |
 | `/api/queue`            | GET        | None                              | Return user's pending orders                             |
+| `/api/instrument/<type>/<id>` | GET        | None                        | Get a Robinhood instrument object by sneding either a known instrument id or a ticker symbol. `type` is either `symbol` or `instrument` and `id` is either the ticker symbol or the instrument id (respectively) |
 | `/api/queue/stop/<instrumentId>`| GET        | None                              | Return user's pending stop sell order for an instrumentId             |
 | `/api/queue/immediate/<instrumentId>`| GET        | None                              | Return user's pending market sell order for an instrumentId             |     
 | `/api/price/<ticker>`   | GET        | None                              | Return instrument price by ticker symbol                 |

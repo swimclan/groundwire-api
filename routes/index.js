@@ -231,11 +231,16 @@ router.get('/queue/:trigger/:instrumentId', bindUser, function(req, res, next) {
 	});
 });
 
-router.get('/instrument/:ticker', bindUser, function(req, res, next) {
+router.get('/instrument/:type/:id', bindUser, function(req, res, next) {
 	utils.secure(req, res);
-	trade.getInstrumentFromTicker(req.user, req.params.ticker)
+	let validTypes = ['symbol', 'instrument'];
+	if (!utils.inArray(req.params.type, validTypes)) {
+		return utils.sendJSONResponse(400, res, {error: "must supply a valid type"});
+	}
+	var instrumentMethod = req.params.type.toLowerCase() === 'symbol' ? trade.getInstrumentFromTicker : trade.getInstrumentFromUrl;
+	instrumentMethod(req.user, req.params.id)
 	.then((inst) => {
-		utils.sendJSONResponse(200, res, { instrument: inst.id });
+		utils.sendJSONResponse(200, res, { instrument: inst });
 	})
 	.catch((err) => {
 		utils.sendJSONResponse(500, res, { error: err });

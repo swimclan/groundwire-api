@@ -1,3 +1,7 @@
+### v1.3.0
+#### Feature
+Added an instrument lookup endpoint that gets an instrument by either instrument id or ticker symbol
+
 ### v1.2.1
 #### Fix
 Fixed error handling on instrument fetching
