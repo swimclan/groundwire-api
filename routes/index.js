@@ -231,4 +231,15 @@ router.get('/queue/:trigger/:instrumentId', bindUser, function(req, res, next) {
 	});
 });
 
+router.get('/instrument/:ticker', bindUser, function(req, res, next) {
+	utils.secure(req, res);
+	trade.getInstrumentFromTicker(req.user, req.params.ticker)
+	.then((inst) => {
+		utils.sendJSONResponse(200, res, { instrument: inst.id });
+	})
+	.catch((err) => {
+		utils.sendJSONResponse(500, res, { error: err });
+	});
+});
+
 module.exports = router;
