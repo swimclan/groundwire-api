@@ -240,7 +240,7 @@ router.get('/instrument/:type/:id', bindUser, function(req, res, next) {
 	var instrumentMethod = req.params.type.toLowerCase() === 'symbol' ? trade.getInstrumentFromTicker : trade.getInstrumentFromUrl;
 	instrumentMethod(req.user, req.params.id)
 	.then((inst) => {
-		utils.sendJSONResponse(200, res, { instrument: inst });
+		utils.sendJSONResponse(200, res, inst);
 	})
 	.catch((err) => {
 		utils.sendJSONResponse(500, res, { error: err });
