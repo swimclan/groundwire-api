@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.3.0
+1.4.0
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -87,6 +87,10 @@ Connected to the Groundwire socket
   price: 824.07 }
 ```
 
+## Simulation
+
+Web socket will support a `simulate` mode which will simulate the price action of stock ticker that is supplied.  Simply add a `simulate` parameter on the URL query string when connecting to the socket.  `0` means do not simulate, whereas `1` means enable simulate.  See below for details on specifying simulate on connection URL.
+
 # Security
 
 ## API Key
@@ -95,7 +99,7 @@ API key is required on calls to all API methods and websocket.  A `key=<value>` 
 | Endpoint Type | API Key Delivery                         |
 | --- | -------------------------------------------------- |
 | API | `https://<server host>/api/<method>?key=<api_key>` |
-| Websocket | `https://<server host>/?ticker&key=<api_key>` |
+| Websocket | `https://<server host>/?ticker&key=<api_key>&simulate=<0|1>` |
 
 Make sure to obtain a key from application admin if using the API on production.
 

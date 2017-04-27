@@ -1,3 +1,7 @@
+### v1.4.0
+#### Feature
+Added a simulation engine that mocks bid, ask and last prices and behaves like a real stock ticker.  Uses the inverse cumulative normal distribution model for randomizing the price action
+
 ### v1.3.0
 #### Feature
 Added an instrument lookup endpoint that gets an instrument by either instrument id or ticker symbol
