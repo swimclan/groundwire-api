@@ -99,7 +99,7 @@ API key is required on calls to all API methods and websocket.  A `key=<value>` 
 | Endpoint Type | API Key Delivery                         |
 | --- | -------------------------------------------------- |
 | API | `https://<server host>/api/<method>?key=<api_key>` |
-| Websocket | `https://<server host>/?ticker&key=<api_key>&simulate=<0|1>` |
+| Websocket | `https://<server host>/?ticker&key=<api_key>&simulate=<0 or 1>` |
 
 Make sure to obtain a key from application admin if using the API on production.
 
