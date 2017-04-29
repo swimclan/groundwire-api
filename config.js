@@ -4,7 +4,7 @@ var utils = require('./lib/utils');
 let config = {
     simulate: {
         tickrate: 2000,
-        volatility: 0.015,
+        volatility: 0.0015,
         spread: {
             mean: 0.02,
             jitter: 0.0075
