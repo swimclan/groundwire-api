@@ -247,4 +247,17 @@ router.get('/instrument/:type/:id', bindUser, function(req, res, next) {
 	});
 });
 
+router.get('/yahoo/:ticker', bindUser, function(req, res, next) {
+	utils.secure(req, res);
+	trade.getYahooPrice(req.params.ticker)
+	.then((price) => {
+		console.log(price);
+		utils.sendJSONResponse(200, res, price);
+	})
+	.catch((err) => {
+		console.log(err);
+		utils.sendJSONResponse(500, res, {error: err});
+	});
+});
+
 module.exports = router;

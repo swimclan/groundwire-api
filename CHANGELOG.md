@@ -1,3 +1,10 @@
+### v1.4.1
+#### Feature
+Improved simulation capability including reading statisical parameters of the simulation from config.
+
+#### Bug
+Fixed a bug where simulation intervals were kept around after the client disconnects thus causing a build up of price simulation intervals.
+
 ### v1.4.0
 #### Feature
 Added a simulation engine that mocks bid, ask and last prices and behaves like a real stock ticker.  Uses the inverse cumulative normal distribution model for randomizing the price action
