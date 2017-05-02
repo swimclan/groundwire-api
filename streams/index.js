@@ -23,6 +23,7 @@ module.exports = function(server, io) {
         var ticker = _has(request.query, 'ticker') ? request.query.ticker : "NULL";
         var simulate = _has(request.query, 'simulate') && parseInt(request.query.simulate) === 1;
         var lastPrice;
+        var iterator = new Iterator();
 
         // Check API KEY and simulation mode to connect sockets
         if (utils.validAPIKey(request)) {
@@ -39,7 +40,6 @@ module.exports = function(server, io) {
         if (simulate) {
             console.log('Enabling simulation mode');
             console.log('Retrieving Yahoo quote for ' + ticker);
-            var iterator = new Iterator();
             trade.getYahooPrice(ticker)
             .then((quote) => {
                 socketEmitter.emit('simulate', {price: quote.price});
