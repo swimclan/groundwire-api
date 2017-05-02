@@ -3,18 +3,13 @@ var IntrinioRealtime = require('intrinio-realtime');
 var irCreds = require('../credentials/intrinio');
 var utils = require('../lib/utils');
 var _has = require('lodash');
-var EventEmitter = require('events');
 var config = require('../config');
 var trade = require('../lib/trading');
 var moment = require('moment');
 var Iterator = require('../lib/Iterator');
 var simulator = require('../lib/simulator');
 
-class SocketEvents extends EventEmitter {}
-var socketEmitter = new SocketEvents();
-
-module.exports = function(server, io) {
-    var socketsServer = io.listen(server);
+module.exports = function(socketsServer) {
     socketsServer.sockets.on('connection', function(socket) {
         console.log("New connection detected");
         console.log("Client id: ", socket.id);
@@ -42,7 +37,7 @@ module.exports = function(server, io) {
             console.log('Retrieving Yahoo quote for ' + ticker);
             trade.getYahooPrice(ticker)
             .then((quote) => {
-                socketEmitter.emit('simulate', {price: quote.price});
+                simulator(socketsServer, quote.price, config.get('simulate.volatility'), ticker, iterator);
             })
             .catch((err) => {
                 console.log(err);
@@ -58,14 +53,9 @@ module.exports = function(server, io) {
             });
         }
 
-        socketEmitter.on('simulate', (e) => {
-            simulator(socketsServer, e.price, config.get('simulate.volatility'), ticker, iterator);
-        });
-
         socket.on('disconnect', function(e) {
             console.log('Thank you for using the GroundWire stock price stream');
             console.log(socket.id, "disconnected");
-            socketEmitter.removeAllListeners();
             iterator.killIterator();
             ir.leaveAll();
             ir.destroy();

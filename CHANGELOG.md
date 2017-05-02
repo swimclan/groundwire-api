@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.4.3**                       | *Fix*        | Fixed a bug with the simulator that was duplicating price action and not allowing for multiple sockets tracking simultaneously |
 | **v1.4.2**                       | *Fix*        | Fixed a bug where the iterator was throwing an error if not in simulate mode |
 | **v1.4.1**                       | *Feature*    | Improved simulation capability including reading statisical parameters of the simulation from config. |
 |                                  | *Fix*        | Fixed a bug where simulation intervals were kept around after the client disconnects thus causing a build up of price simulation intervals. |
