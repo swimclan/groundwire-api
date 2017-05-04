@@ -2,28 +2,28 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.4.3
+1.4.4
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
 # API
 ## Service Root URI
-The API's service root is at `/api/` and will run the expressJS app on port 80.  Currently there is no support for SSL but that will be coming in future release.
+The API's service root is at `/v1/` and will run the expressJS app on port 3000.  Currently there is support for SSL on production.
 
 ## API Methods
 | URI                     | HTTP Verb  | Request Body                      | Description                                              |
 | ----------------------- | ---------- | --------------------------------- | -------------------------------------------------------- |
-| `/api/`                 | GET        | None                              | Return RH account setup info for user                    |
-| `/api/user`             | GET        | None                              | Return RH user information                               |
-| `/api/accounts`         | GET        | None                              | Return user's RH account(s) status(es) including account balance |
-| `/api/positions`        | GET        | None                              | Return user's current RH positions                       |
-| `/api/queue`            | GET        | None                              | Return user's pending orders                             |
-| `/api/instrument/<type>/<id>` | GET        | None                        | Get a Robinhood instrument object by sneding either a known instrument id or a ticker symbol. `type` is either `symbol` or `instrument` and `id` is either the ticker symbol or the instrument id (respectively) |
-| `/api/queue/stop/<instrumentId>`| GET        | None                              | Return user's pending stop sell order for an instrumentId             |
-| `/api/queue/immediate/<instrumentId>`| GET        | None                              | Return user's pending market sell order for an instrumentId             |     
-| `/api/price/<ticker>`   | GET        | None                              | Return instrument price by ticker symbol                 |
-| `/api/watchlist`        | GET        | None                              | Return all instruments on the user's watchlist           |
-| `/api/trade`            | POST       | * `symbol` [optional ticker symbol]<br>* `instrumentId` [optional RH instrumentID]<br>* `quantity` [integer]<br>* `type` [buy/sell]<br>* `stop_price` [optional float] | Execute either a buy or sell trade.  Buy trades will all be market buy orders and sell trades will either be stop-loss or market sell orders depending on whether a `stop_price` value is sent in the request.  If sending a stop loss sell order you must send in a `stop_price` value. |
+| `/v1/`                 | GET        | None                              | Return RH account setup info for user                    |
+| `/v1/user`             | GET        | None                              | Return RH user information                               |
+| `/v1/accounts`         | GET        | None                              | Return user's RH account(s) status(es) including account balance |
+| `/v1/positions`        | GET        | None                              | Return user's current RH positions                       |
+| `/v1/queue`            | GET        | None                              | Return user's pending orders                             |
+| `/v1/instrument/<type>/<id>` | GET        | None                        | Get a Robinhood instrument object by sneding either a known instrument id or a ticker symbol. `type` is either `symbol` or `instrument` and `id` is either the ticker symbol or the instrument id (respectively) |
+| `/v1/queue/stop/<instrumentId>`| GET        | None                              | Return user's pending stop sell order for an instrumentId             |
+| `/v1/queue/immediate/<instrumentId>`| GET        | None                              | Return user's pending market sell order for an instrumentId             |
+| `/v1/price/<ticker>`   | GET        | None                              | Return instrument price by ticker symbol                 |
+| `/v1/watchlist`        | GET        | None                              | Return all instruments on the user's watchlist           |
+| `/v1/trade`            | POST       | * `symbol` [optional ticker symbol]<br>* `instrumentId` [optional RH instrumentID]<br>* `quantity` [integer]<br>* `type` [buy/sell]<br>* `stop_price` [optional float] | Execute either a buy or sell trade.  Buy trades will all be market buy orders and sell trades will either be stop-loss or market sell orders depending on whether a `stop_price` value is sent in the request.  If sending a stop loss sell order you must send in a `stop_price` value. |
 | `/api/cancel`           | DELETE     | * `instrumentId` [RH instrumentID]<br>* `trigger` [stop/immediate] | Cancel any pending market (trigger `immediate`) or stop (trigger `stop`) sell order that is in the queue.  Can be used to move a stop loss position that is managed by RH. |
 
 ## Sample API Response
@@ -53,7 +53,7 @@ The API now supports a websocket connection to deliver realtime price quote data
 ## Websocket URI
 Connect to the websocket at the root `/`.  User must send both a valid stock exchange ticker symbol and a valid API key (see 'API Key' below for more info).  
 
-Production websocket URL exmaple: `https://groundwire.co?ticker=<ticker>&key=<api_key>`
+Production websocket URL exmaple: `https://api.groundwire.co?ticker=<ticker>&key=<api_key>`
 
 ## Websocket Events & Data
 
@@ -65,9 +65,10 @@ Web socket will trigger a `quote` event with an object hash containing the follo
 | `timestamp`             | The epoch timestamp of when the price was observed on the market                                          |
 | `ticker`                | The ticker symbol of the stock instrument in question                                                     |
 | `size`                  | The volume of transactions that occured since the last tick                                               |
+| `price`                 | The price value for the quote
 
 ## Sample Response
-Here is a sample of a frame of data that will be returned from the websocket on the `quote` event:
+Here is a sample of frames of data that will be returned from the websocket on the `quote` event:
 ```sh
 Connected to the Groundwire socket
 { type: 'ask',
@@ -100,7 +101,7 @@ API key is required on calls to all API methods and websocket.  A `key=<value>` 
 
 | Endpoint Type | API Key Delivery                         |
 | --- | -------------------------------------------------- |
-| API | `https://<server host>/api/<method>?key=<api_key>` |
+| API | `https://<server host>/v1/<method>?key=<api_key>` |
 | Websocket | `https://<server host>/?ticker&key=<api_key>&simulate=<0 or 1>` |
 
 Make sure to obtain a key from application admin if using the API on production.
