@@ -109,13 +109,16 @@ router.get('/watchlist', bindUser, function(req, res, next) {
 router.post('/trade', bindUser, function(req, res, next) {
 	utils.secure(req, res);
 	var reqBody = req.body;
-	if (!reqBody.type) { 
+	if (!reqBody.type) {
+		console.log("Must specify a trade type");
 		return utils.sendJSONResponse(400, res, { error: { message: "Must specify a trade type" } });
 	} 
 	if (Object.keys(reqBody).indexOf("quantity") === -1) {
+		console.log("Must specify a quantity");
 		return utils.sendJSONResponse(400, res, { error: { message: "Must specify a quantity" } });
 	} 
 	if (Object.keys(reqBody).indexOf("symbol") === -1 && Object.keys(reqBody).indexOf("instrumentId") === -1) {
+		console.log("Must specify either a symbol or an instrument ID");
 		return utils.sendJSONResponse(400, res, { error: { message: "Must specify either a symbol or an instrument ID" } });	
 	}
 	if (Object.keys(reqBody).indexOf("symbol") !== -1) {
