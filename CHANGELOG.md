@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.4.6**                       | *Feature*    | Supporting the "min tick" NYSE pilot for rounding price to specified increments on market orders |
 | **v1.4.5**                       | *Fix*        | Fixed a bug where the price being sent to the market buy order was sub-penny fractional. |
 | **v1.4.4**                       | *Feature*    | Moved the production api to `api.groundwire.co` and changed service root to `/v1/` for versioning |
 | **v1.4.3**                       | *Fix*        | Fixed a bug with the simulator that was duplicating price action and not allowing for multiple sockets tracking simultaneously |

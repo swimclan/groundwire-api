@@ -5,6 +5,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var trade = require('../lib/trading');
 var utils = require('../lib/utils');
+var pkg = require('../package.json');
 
 /* MIDDLEWARE */
 let bindUser = function(req, res, next) {
@@ -145,7 +146,7 @@ router.post('/trade', bindUser, function(req, res, next) {
 	.then(function(inst) {
 		trade.getPrice(req.user, inst.symbol)
 		.then(function(data) {
-			trade.buildOrderOptions(req.user, inst.url, quantity, data.last_trade_price, stopPrice ? { price: stopPrice } : null)
+			trade.buildOrderOptions(req.user, inst.url, quantity, data.last_trade_price, inst.min_tick_size, stopPrice ? { price: stopPrice } : null)
 			.then(function(options) {
 			    tradeMethod(req.user, options)
 			    .then(function(buy) {
@@ -261,6 +262,14 @@ router.get('/yahoo/:ticker', bindUser, function(req, res, next) {
 		console.log(err);
 		utils.sendJSONResponse(500, res, {error: err});
 	});
+});
+
+router.get('/version', function(req, res, next) {
+	try {
+		utils.sendJSONResponse(200, res, { version: pkg.version });
+	} catch (error) {
+		utils.sendJSONResponse(500, res, error);
+	}
 });
 
 module.exports = router;
