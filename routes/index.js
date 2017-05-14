@@ -146,20 +146,14 @@ router.post('/trade', bindUser, function(req, res, next) {
 	.then(function(inst) {
 		trade.getPrice(req.user, inst.symbol)
 		.then(function(data) {
-			trade.buildOrderOptions(req.user, inst.url, quantity, data.last_trade_price, inst.min_tick_size, stopPrice ? { price: stopPrice } : null)
-			.then(function(options) {
-			    tradeMethod(req.user, options)
-			    .then(function(buy) {
-			    	utils.sendJSONResponse(200, res, buy);
-			    })
-			    .catch(function(err) {
-			    	console.log(err);
-			    	utils.sendJSONResponse(500, res, { error: err })
-			    });
+			var options = trade.buildOrderOptions(req.user, inst, quantity, data.last_trade_price, stopPrice ? { price: stopPrice } : null);
+			tradeMethod(req.user, options)
+			.then(function(buy) {
+				utils.sendJSONResponse(200, res, buy);
 			})
 			.catch(function(err) {
 				console.log(err);
-				utils.sendJSONResponse(500, res, { error: err });
+				utils.sendJSONResponse(500, res, { error: err })
 			});
 		})
 		.catch(function(err) {
