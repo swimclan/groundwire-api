@@ -5,20 +5,44 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var trade = require('../lib/trading');
 var utils = require('../lib/utils');
+var RH = require('../lib/RH');
 var pkg = require('../package.json');
+var _ = require('lodash');
+try {
+	var userCreds = require('../credentials/robinhood');
+} catch (e) {
+	var userCreds;
+}
 
 /* MIDDLEWARE */
-let bindUser = function(req, res, next) {
-	req.user = utils.authenticatedUser(req);
-	next();
+let bindUserSession = function(req, res, next) {
+	req.user = !_.isUndefined(userCreds) ? userCreds : utils.authenticatedUser(req);
+	var encodedUser = utils.encodeUser(req.user);	
+	req.app.locals.sessions.get(encodedUser)
+	.then((options) => {
+		req.rh = options.rh;
+		next();
+	}).catch(() => {
+		new RH(req.user).authenticate(req.user)
+		.then((rh) => {
+			return req.app.locals.sessions.create(encodedUser, {rh: rh.instance});
+		})
+		.then((session) => {
+			return session.get(encodedUser);
+		})
+		.then((options) => {
+			req.rh = options.rh;
+			next();
+		});
+	});
 }
 
 /* ROUTES */
 /* GET investor profile */
-router.get('/', bindUser, function(req, res, next) {
+router.get('/', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	console.log("Getting investor profile");
-	trade.getProfile(req.user)
+	trade.getProfile(req.rh)
 	.then(function(profile) {
 		utils.sendJSONResponse(200, res, profile);
 	})
@@ -28,10 +52,10 @@ router.get('/', bindUser, function(req, res, next) {
 });
 
 /* GET user profile */
-router.get('/user', bindUser, function(req, res, next) {
+router.get('/user', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	console.log("Getting user profile");
-	trade.getUser(req.user)
+	trade.getUser(req.rh)
 	.then(function(user) {
 		utils.sendJSONResponse(200, res, user);
 	})
@@ -41,10 +65,10 @@ router.get('/user', bindUser, function(req, res, next) {
 });
 
 /* GET user account */
-router.get('/accounts', bindUser, function(req, res, next) {
+router.get('/accounts', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	console.log("Getting user account");
-	trade.getAccounts(req.user)
+	trade.getAccounts(req.rh)
 	.then(function(account) {
 		utils.sendJSONResponse(200, res, account);
 	})
@@ -54,9 +78,9 @@ router.get('/accounts', bindUser, function(req, res, next) {
 });
 
 /* GET positions */
-router.get('/positions', bindUser, function(req, res, next) {
+router.get('/positions', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
-	trade.getPositions(req.user)
+	trade.getPositions(req.rh)
 	.then(function(positions) {
 		utils.sendJSONResponse(200, res, positions);
 	})
@@ -66,10 +90,10 @@ router.get('/positions', bindUser, function(req, res, next) {
 });
 
 /* GET queued orders */
-router.get('/queue', bindUser, function(req, res, next) {
+router.get('/queue', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	console.log("Getting orders");
-	trade.findQueuedOrdersByInstrument(req.user)
+	trade.findQueuedOrdersByInstrument(req.rh)
 	.then(function(orders) {
 		utils.sendJSONResponse(200, res, orders);
 	})
@@ -80,11 +104,11 @@ router.get('/queue', bindUser, function(req, res, next) {
 });
 
 /* GET ticker price */
-router.get('/price/:ticker', bindUser, function(req, res, next) {
+router.get('/price/:ticker', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	var ticker = req.params.ticker;
 	console.log(`Getting price data for: ${ticker} `);
-	trade.getPrice(req.user, ticker)
+	trade.getPrice(req.rh, ticker)
  	.then(function(data) {
  		utils.sendJSONResponse(200, res, data);	
 	})
@@ -94,11 +118,10 @@ router.get('/price/:ticker', bindUser, function(req, res, next) {
 });
 
 /* GET watchlists */
-router.get('/watchlist', bindUser, function(req, res, next) {
+router.get('/watchlist', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
-	trade.getWatchList(req.user)
+	trade.getWatchList(req.rh)
 	.then(function(watchlist) {
-		console.log(watchlist);
 		utils.sendJSONResponse(200, res, watchlist);
 	})
 	.catch(function(err) {
@@ -107,7 +130,7 @@ router.get('/watchlist', bindUser, function(req, res, next) {
 });
 
 /* POST place buy order  */
-router.post('/trade', bindUser, function(req, res, next) {
+router.post('/trade', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	var reqBody = req.body;
 	if (!reqBody.type) {
@@ -142,12 +165,12 @@ router.post('/trade', bindUser, function(req, res, next) {
 		stopPrice = req.body.stop_price;
 	}
 	var instrumentQueryMethod = instQueryType === 'symbol' ? trade.getInstrumentFromTicker : trade.getInstrumentFromUrl
-	instrumentQueryMethod(req.user, instQuery)
+	instrumentQueryMethod(req.rh, instQuery)
 	.then(function(inst) {
-		trade.getPrice(req.user, inst.symbol)
+		trade.getPrice(req.rh, inst.symbol)
 		.then(function(data) {
-			var options = trade.buildOrderOptions(req.user, inst, quantity, data.last_trade_price, stopPrice ? { price: stopPrice } : null);
-			tradeMethod(req.user, options)
+			var options = trade.buildOrderOptions(inst, quantity, data.last_trade_price, stopPrice ? { price: stopPrice } : null);
+			tradeMethod(req.rh, options)
 			.then(function(buy) {
 				utils.sendJSONResponse(200, res, buy);
 			})
@@ -168,7 +191,7 @@ router.post('/trade', bindUser, function(req, res, next) {
 });
 
 /* DELETE cancel queued stop sell */
-router.delete('/cancel', bindUser, function(req, res, next) {
+router.delete('/cancel', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	var reqBody = req.body;
 	if (Object.keys(reqBody).indexOf("instrumentId") === -1) {
@@ -193,7 +216,7 @@ router.delete('/cancel', bindUser, function(req, res, next) {
 			cancelMethod = trade.cancelQueuedMarketSell.bind(trade);
 	}
 
-	cancelMethod(req.user, reqBody.instrumentId)
+	cancelMethod(req.rh, reqBody.instrumentId)
 	.then(function(cancelledOrder) {
 		return utils.sendJSONResponse(200, res, cancelledOrder);
 	})
@@ -203,7 +226,7 @@ router.delete('/cancel', bindUser, function(req, res, next) {
 	});
 });
 
-router.get('/auth', bindUser, function(req, res, next) {
+router.get('/auth', bindUserSession, function(req, res, next) {
 	let checkUser = utils.authenticatedUser(req);
 	if (checkUser) {
 		utils.sendJSONResponse(200, res, checkUser);
@@ -212,7 +235,7 @@ router.get('/auth', bindUser, function(req, res, next) {
 	}
 });
 
-router.get('/queue/:trigger/:instrumentId', bindUser, function(req, res, next) {
+router.get('/queue/:trigger/:instrumentId', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	var valid_triggers = ['stop', 'immediate'];
 	if (valid_triggers.indexOf(req.params.trigger) === -1) return utils.sendJSONResponse(400, res, { error: "trigger must me either stop or immediate" });
@@ -229,14 +252,14 @@ router.get('/queue/:trigger/:instrumentId', bindUser, function(req, res, next) {
 	});
 });
 
-router.get('/instrument/:type/:id', bindUser, function(req, res, next) {
+router.get('/instrument/:type/:id', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	let validTypes = ['symbol', 'instrument'];
 	if (!utils.inArray(req.params.type, validTypes)) {
 		return utils.sendJSONResponse(400, res, {error: "must supply a valid type"});
 	}
 	var instrumentMethod = req.params.type.toLowerCase() === 'symbol' ? trade.getInstrumentFromTicker : trade.getInstrumentFromUrl;
-	instrumentMethod(req.user, req.params.id)
+	instrumentMethod(req.rh, req.params.id)
 	.then((inst) => {
 		utils.sendJSONResponse(200, res, inst);
 	})
@@ -245,7 +268,7 @@ router.get('/instrument/:type/:id', bindUser, function(req, res, next) {
 	});
 });
 
-router.get('/yahoo/:ticker', bindUser, function(req, res, next) {
+router.get('/yahoo/:ticker', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	trade.getYahooPrice(req.params.ticker)
 	.then((price) => {
