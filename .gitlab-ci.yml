@@ -2,4 +2,5 @@ before_script:
   - pwd
 
 gwapi:
-  - npm cache clean
+  script:
+    - npm cache clean
