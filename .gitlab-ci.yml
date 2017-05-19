@@ -1,5 +1,6 @@
 before_script:
   - pwd
+  - docker ps
 
 gwapi:
   script:
