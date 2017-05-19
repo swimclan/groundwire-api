@@ -1,5 +1,5 @@
 before_script:
   - pwd
 
-install:
+gwapi:
   - npm cache clean
