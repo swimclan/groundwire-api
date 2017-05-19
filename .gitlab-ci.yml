@@ -4,3 +4,4 @@ before_script:
 gwapi:
   script:
     node -v
+    npm install
