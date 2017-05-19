@@ -3,4 +3,4 @@ before_script:
 
 gwapi:
   script:
-    - npm cache clean
+    node -v
