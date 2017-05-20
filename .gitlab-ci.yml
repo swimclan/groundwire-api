@@ -6,7 +6,7 @@ stages:
 deploy:
   stage: deploy
   script:
-    - ls /opt
+    - cp /opt/groundwire/config/credentials .
     - npm install
     - ./bin/www
   tags:
