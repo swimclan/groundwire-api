@@ -15,6 +15,7 @@ build:
 deploy:
   stage: deploy
   script:
+    - npm install
     - ./bin/www
   tags:
     - trader-api
