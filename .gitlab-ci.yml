@@ -1,20 +1,12 @@
 image: node:latest
 
 stages:
-  - build
   - deploy
-
-build:
-  stage: build
-  script:
-    - npm install express -g
-    - npm install
-  tags:
-    - trader-api
 
 deploy:
   stage: deploy
   script:
+    - ls /opt
     - npm install
     - ./bin/www
   tags:
