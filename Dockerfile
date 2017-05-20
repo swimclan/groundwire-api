@@ -1,2 +1,2 @@
 FROM node:latest
-COPY /opt /
+COPY /opt/groundwire /opt
