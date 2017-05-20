@@ -1,7 +1,0 @@
-before_script:
-  - pwd
-
-gwapi:
-  script:
-    - node -v
-    - npm install
