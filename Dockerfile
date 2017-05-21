@@ -12,4 +12,5 @@ RUN npm install
 COPY . /tradingapi
 
 #run the application in the image
+EXPOSE 3000
 CMD ["node", "bin/www"]
