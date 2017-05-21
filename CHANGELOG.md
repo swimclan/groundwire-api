@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.6.0**                       | *Feature*    | Implemented GitLab continuous integration build deployment system |
 | **v1.5.0**                       | *Feature*    | Added ability to store multiple user sessions to avoid having to refresh an auth token with each API call |
 | **v1.4.8**                       | *Fix*        | Optimized the trading route to make less calls to the instrument endpoint.  May be causing failures on the position creation in the trading app |
 | **v1.4.7**                       | *Fix*        | Upgraded robinhood.js node lib to 0.10.0 to fix some instability in url instrument queries |

@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.5.0
+1.6.0
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -135,6 +135,10 @@ The `credentials.js` file is not required to target a specific account in Robinh
 ```
 Authorization: Basic 298fhq3rg9h3=
 ```
+
+# Continuous Deployment 
+
+This server is configured to utilize the GitLab Continuous Integration (CI) service.  All commits on the master branch within the source code repository hosted at GitLab will automatically trigger a build/deploy procedure on GitLab and on the Groundwire Trading API server.
 
 # Installing Locally
 
