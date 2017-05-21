@@ -1,16 +1,2 @@
-before_script:
-  - cp -r /opt/groundwire/config/.env .
-  - cp -r /opt/groundwire/config/credentials/ .
-
-destroy:
-  script:
-    - docker stop tradingapi
-    - docker rm tradingapi
-    - docker rmi tradingapi
-build:
-  script:
-    - docker build -t tradingapi .  
-
-run:
-  script:
-    - docker run -d --name tradingapi -p 3000:3000 tradingapi
+deploy:
+  /opt/groundwire/build.sh
