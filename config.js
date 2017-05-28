@@ -21,6 +21,11 @@ let config = {
 		    env: "store://datatables.org/alltableswithkeys",
 		    format: "json"
         }
+    },
+    tradingEconomics: {
+        url: {
+            root: "https://tradingeconomics.com/united-states/holidays"
+        }
     }
 }
 

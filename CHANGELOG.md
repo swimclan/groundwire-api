@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.6.1**                       | *Feature*    | Ability to get market holiday schedule for the current year (data provided by [tradingeconomics.com](https://tradingeconomics.com)) |
 | **v1.6.0**                       | *Feature*    | Implemented GitLab continuous integration build deployment system |
 | **v1.5.0**                       | *Feature*    | Added ability to store multiple user sessions to avoid having to refresh an auth token with each API call |
 | **v1.4.8**                       | *Fix*        | Optimized the trading route to make less calls to the instrument endpoint.  May be causing failures on the position creation in the trading app |

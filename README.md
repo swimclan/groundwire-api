@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.6.0
+1.6.1
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -24,7 +24,8 @@ The API's service root is at `/v1/` and will run the expressJS app on port 3000.
 | `/v1/price/<ticker>`   | GET        | None                              | Return instrument price by ticker symbol                 |
 | `/v1/watchlist`        | GET        | None                              | Return all instruments on the user's watchlist           |
 | `/v1/trade`            | POST       | * `symbol` [optional ticker symbol]<br>* `instrumentId` [optional RH instrumentID]<br>* `quantity` [integer]<br>* `type` [buy/sell]<br>* `stop_price` [optional float] | Execute either a buy or sell trade.  Buy trades will all be market buy orders and sell trades will either be stop-loss or market sell orders depending on whether a `stop_price` value is sent in the request.  If sending a stop loss sell order you must send in a `stop_price` value. |
-| `/api/cancel`           | DELETE     | * `instrumentId` [RH instrumentID]<br>* `trigger` [stop/immediate] | Cancel any pending market (trigger `immediate`) or stop (trigger `stop`) sell order that is in the queue.  Can be used to move a stop loss position that is managed by RH. |
+| `/v1/cancel`           | DELETE     | * `instrumentId` [RH instrumentID]<br>* `trigger` [stop/immediate] | Cancel any pending market (trigger `immediate`) or stop (trigger `stop`) sell order that is in the queue.  Can be used to move a stop loss position that is managed by RH. |
+| `/v1/holidays`         | GET        | None                             | Returns a JSON list of all market holidays for the current year |
 
 ## Sample API Response
 Here is a sample JSON response that is returned from the GET `/api/price/<ticker>` method:

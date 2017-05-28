@@ -281,6 +281,14 @@ router.get('/yahoo/:ticker', bindUserSession, function(req, res, next) {
 	});
 });
 
+router.get('/holidays', bindUserSession, function(req, res, next) {
+	utils.secure(req, res);
+	trade.getCalendar()
+	.then((calendar) => {
+		return utils.sendJSONResponse(200, res, calendar);
+	}).catch((err) => { utils.sendJSONResponse(500, res, {error: err}) });
+});
+
 router.get('/version', function(req, res, next) {
 	try {
 		utils.sendJSONResponse(200, res, { version: pkg.version });
