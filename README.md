@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.6.1
+1.6.2
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -18,6 +18,7 @@ The API's service root is at `/v1/` and will run the expressJS app on port 3000.
 | `/v1/accounts`         | GET        | None                              | Return user's RH account(s) status(es) including account balance |
 | `/v1/positions`        | GET        | None                              | Return user's current RH positions                       |
 | `/v1/queue`            | GET        | None                              | Return user's pending orders                             |
+| `/v1/orders/<instrumentId>` | GET        | None                              | Return user's filled orders for a specific instrumentId |
 | `/v1/instrument/<type>/<id>` | GET        | None                        | Get a Robinhood instrument object by sneding either a known instrument id or a ticker symbol. `type` is either `symbol` or `instrument` and `id` is either the ticker symbol or the instrument id (respectively) |
 | `/v1/queue/stop/<instrumentId>`| GET        | None                              | Return user's pending stop sell order for an instrumentId             |
 | `/v1/queue/immediate/<instrumentId>`| GET        | None                              | Return user's pending market sell order for an instrumentId             |

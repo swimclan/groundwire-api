@@ -93,11 +93,25 @@ router.get('/positions', bindUserSession, function(req, res, next) {
 router.get('/queue', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	console.log("Getting orders");
-	trade.findQueuedOrdersByInstrument(req.rh)
+	trade.findOrdersByInstrument(req.rh, 'queued')
 	.then(function(orders) {
 		utils.sendJSONResponse(200, res, orders);
 	})
 	.catch(function(err) {
+		console.log(err);
+		utils.sendJSONResponse(500, res, { error: err });
+	});
+});
+
+/* GET filled orders by instrument */
+router.get('/orders/:instrumentid', bindUserSession, function(req, res, next) {
+	utils.secure(req, res);
+	if (_.isUndefined(req.params.instrumentid)) return utils.sendJSONResponse(400, res, { error: { message: "Must supply a valid instrument id" } });
+	console.log(`getting orders for: ${req.params.instrumentid}`);
+	trade.findOrdersByInstrument(req.rh, 'filled', req.params.instrumentid)
+	.then((orders) => {
+		utils.sendJSONResponse(200, res, orders);
+	}).catch((err) => {
 		console.log(err);
 		utils.sendJSONResponse(500, res, { error: err });
 	});
@@ -243,7 +257,7 @@ router.get('/queue/:trigger/:instrumentId', bindUserSession, function(req, res, 
 		console.log("error: must supply an instrumentId");
 		utils.sendJSONResponse(400, res, { error: "must supply an instrumentId" });
 	}
-	trade.findQueuedSellOrderByInstrument(req.user, req.params.instrumentId, req.params.trigger)
+	trade.findQueuedSellOrderByInstrument(req.rh, req.params.instrumentId, req.params.trigger)
 	.then(function(stopOrder) {
 		utils.sendJSONResponse(200, res, stopOrder);
 	})
