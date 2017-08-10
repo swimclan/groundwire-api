@@ -2,7 +2,11 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
+<<<<<<< HEAD
 1.7.0
+=======
+1.7.1
+>>>>>>> Supporting bearer token standard for authentication
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -14,7 +18,7 @@ The API's service root is at `/v1/` and will run the expressJS app on port 3000.
 | URI                     | HTTP Verb  | Request Body                      | Description                                              |
 | ----------------------- | ---------- | --------------------------------- | -------------------------------------------------------- |
 | `/v1/`                 | GET        | None                              | Return RH account setup info for user                    |
-| `/v1/user`             | GET        | None                              | Return RH user information                               |
+| `/v1/user`             | GET        | None                              | Return RH user information and authenticated RH api token |
 | `/v1/accounts`         | GET        | None                              | Return user's RH account(s) status(es) including account balance |
 | `/v1/positions`        | GET        | None                              | Return user's current RH positions                       |
 | `/v1/queue`            | GET        | None                              | Return user's pending orders                             |
@@ -136,6 +140,12 @@ The `credentials.js` file is not required to target a specific account in Robinh
 
 ```
 Authorization: Basic 298fhq3rg9h3=
+```
+
+*UPDATE* You can also now send a RH auth token in place of an encoded username and password.  Simply send the previously authenticated RH token in the Authorization header with the `Bearer` classification like this:
+
+```js
+Authorization: Bearer 98h34g98u3g9iwrgijn398
 ```
 
 # Continuous Deployment 

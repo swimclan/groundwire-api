@@ -17,7 +17,7 @@ try {
 /* MIDDLEWARE */
 let bindUserSession = function(req, res, next) {
 	req.user = !_.isUndefined(userCreds) ? userCreds : utils.authenticatedUser(req);
-	var encodedUser = utils.encodeUser(req.user);	
+	var encodedUser = utils.encodeUser(req.user);
 	req.app.locals.sessions.get(encodedUser)
 	.then((options) => {
 		req.rh = options.rh;
