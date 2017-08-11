@@ -8,6 +8,7 @@ var utils = require('../lib/utils');
 var RH = require('../lib/RH');
 var pkg = require('../package.json');
 var _ = require('lodash');
+var Subscribers = require('../lib/Subscribers');
 try {
 	var userCreds = require('../credentials/robinhood');
 } catch (e) {
@@ -309,6 +310,12 @@ router.get('/version', function(req, res, next) {
 	} catch (error) {
 		utils.sendJSONResponse(500, res, error);
 	}
+});
+
+router.get('/subscribers', function(req, res, next) {
+	utils.secure(req, res);
+	let subscribers = Subscribers.getInstance();
+	utils.sendJSONResponse(200, res, subscribers.all());
 });
 
 module.exports = router;

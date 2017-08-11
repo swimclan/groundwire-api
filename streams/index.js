@@ -8,9 +8,12 @@ var trade = require('../lib/trading');
 var moment = require('moment');
 var Iterator = require('../lib/Iterator');
 var simulator = require('../lib/simulator');
+var Subscribers = require('../lib/Subscribers');
 
 module.exports = function(socketsServer) {
+    let subscribers = Subscribers.getInstance();
     socketsServer.sockets.on('connection', function(socket) {
+        subscribers.add({id: socket.client.id, rooms: socket.rooms});
         console.log("New connection detected");
         console.log("Client id: ", socket.id);
         let ir = new IntrinioRealtime(irCreds);
@@ -29,6 +32,7 @@ module.exports = function(socketsServer) {
             console.log("Disconnecting client: ", socket.id);
             socket.emit('close', 'Error: Invalid or no api key provided');
             socket.disconnect();
+            subscribers.remove(socket.client.id);
         }
 
         // Start either simulation mode or live mode
@@ -43,6 +47,7 @@ module.exports = function(socketsServer) {
                 console.log(err);
                 socket.emit('close', 'Simulator could not retrieve current quote from Yahoo.  Disconnecting...');
                 socket.disconnect();
+                subscribers.remove(socket.client.id);
             });
         } else {
             // Listen for Intrinio price frames
@@ -59,6 +64,7 @@ module.exports = function(socketsServer) {
             iterator.killIterator();
             ir.leaveAll();
             ir.destroy();
+            subscribers.remove(socket.client.id);
         });
     });
 }

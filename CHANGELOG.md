@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.8.0**                       | *Feature*    | Added api route to send currently connected list of socket subscribers |
 | **v1.7.1**                       | *Update*     | Updated Token authentication to use the Bearer standard           |
 | **v1.7.0**                       | *Feature*    | Upgrade Robinhood API wrapper to version 1.0.0 and support RH auth token authentication |
 | **v1.6.2**                       | *Feature*    | Added a route to find all filled orders by instrumentId           |
