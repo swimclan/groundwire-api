@@ -9,11 +9,14 @@ var RH = require('../lib/RH');
 var pkg = require('../package.json');
 var _ = require('lodash');
 var Subscribers = require('../lib/Subscribers');
+var Logger = require('../lib/Logger');
 try {
 	var userCreds = require('../credentials/robinhood');
 } catch (e) {
 	var userCreds;
 }
+
+let logger = Logger.getInstance({enabled: process.env.LOGGER == 1});
 
 /* MIDDLEWARE */
 let bindUserSession = function(req, res, next) {
@@ -42,7 +45,6 @@ let bindUserSession = function(req, res, next) {
 /* GET investor profile */
 router.get('/', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
-	console.log("Getting investor profile");
 	trade.getProfile(req.rh)
 	.then(function(profile) {
 		utils.sendJSONResponse(200, res, profile);
@@ -55,7 +57,6 @@ router.get('/', bindUserSession, function(req, res, next) {
 /* GET user profile */
 router.get('/user', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
-	console.log("Getting user profile");
 	trade.getUser(req.rh)
 	.then(function(user) {
 		utils.sendJSONResponse(200, res, user);
@@ -68,7 +69,6 @@ router.get('/user', bindUserSession, function(req, res, next) {
 /* GET user account */
 router.get('/accounts', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
-	console.log("Getting user account");
 	trade.getAccounts(req.rh)
 	.then(function(account) {
 		utils.sendJSONResponse(200, res, account);
@@ -93,13 +93,11 @@ router.get('/positions', bindUserSession, function(req, res, next) {
 /* GET queued orders */
 router.get('/queue', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
-	console.log("Getting orders");
 	trade.findOrdersByInstrument(req.rh, 'queued')
 	.then(function(orders) {
 		utils.sendJSONResponse(200, res, orders);
 	})
 	.catch(function(err) {
-		console.log(err);
 		utils.sendJSONResponse(500, res, { error: err });
 	});
 });
@@ -108,12 +106,10 @@ router.get('/queue', bindUserSession, function(req, res, next) {
 router.get('/orders/:instrumentid', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	if (_.isUndefined(req.params.instrumentid)) return utils.sendJSONResponse(400, res, { error: { message: "Must supply a valid instrument id" } });
-	console.log(`getting orders for: ${req.params.instrumentid}`);
 	trade.findOrdersByInstrument(req.rh, 'filled', req.params.instrumentid)
 	.then((orders) => {
 		utils.sendJSONResponse(200, res, orders);
 	}).catch((err) => {
-		console.log(err);
 		utils.sendJSONResponse(500, res, { error: err });
 	});
 });
@@ -122,7 +118,6 @@ router.get('/orders/:instrumentid', bindUserSession, function(req, res, next) {
 router.get('/price/:ticker', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	var ticker = req.params.ticker;
-	console.log(`Getting price data for: ${ticker} `);
 	trade.getPrice(req.rh, ticker)
  	.then(function(data) {
  		utils.sendJSONResponse(200, res, data);	
@@ -149,15 +144,15 @@ router.post('/trade', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	var reqBody = req.body;
 	if (!reqBody.type) {
-		console.log("Must specify a trade type");
+		logger.log('ERROR!', 'No trade type was specified');
 		return utils.sendJSONResponse(400, res, { error: { message: "Must specify a trade type" } });
 	} 
 	if (Object.keys(reqBody).indexOf("quantity") === -1) {
-		console.log("Must specify a quantity");
+		logger.log('ERROR!', 'No trade quantity was specified');
 		return utils.sendJSONResponse(400, res, { error: { message: "Must specify a quantity" } });
 	} 
 	if (Object.keys(reqBody).indexOf("symbol") === -1 && Object.keys(reqBody).indexOf("instrumentId") === -1) {
-		console.log("Must specify either a symbol or an instrument ID");
+		logger.log('ERROR!', 'No symbol or instrument ID was specified');
 		return utils.sendJSONResponse(400, res, { error: { message: "Must specify either a symbol or an instrument ID" } });	
 	}
 	if (Object.keys(reqBody).indexOf("symbol") !== -1) {
@@ -174,7 +169,6 @@ router.post('/trade', bindUserSession, function(req, res, next) {
 	var stopPrice = null;
 	if (orderType !== 'buy' && !req.body.stop_price) {
 		//return utils.sendJSONResponse(400, res, { error: { message: "Sell orders must include a stop loss price" } });
-		console.log('Preparing a market sell order...');
 		stopPrice = null;
 	} else {
 		stopPrice = req.body.stop_price;
@@ -190,17 +184,14 @@ router.post('/trade', bindUserSession, function(req, res, next) {
 				utils.sendJSONResponse(200, res, buy);
 			})
 			.catch(function(err) {
-				console.log(err);
 				utils.sendJSONResponse(500, res, { error: err })
 			});
 		})
 		.catch(function(err) {
-			console.log(err);
 			utils.sendJSONResponse(500, res, { error: err });
 		});
 	})
 	.catch(function(err){
-		console.log(err);
 		utils.sendJSONResponse(500, res, { error: err });
 	});
 });
@@ -210,11 +201,11 @@ router.delete('/cancel', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	var reqBody = req.body;
 	if (Object.keys(reqBody).indexOf("instrumentId") === -1) {
-		console.log("Error: An instrument ID was not found in request");
+		logger.log('ERROR!', 'An instrument ID was not found in request');
 		return utils.sendJSONResponse(400, res, { error: "Error: An instrument ID was not found in request" });
 	}
 	if (Object.keys(reqBody).indexOf("trigger") === -1) {
-		console.log("Error: A trigger type was not found in request");
+		logger.log('ERROR!', 'A trigger type was not found in request');
 		return utils.sendJSONResponse(400, res, { error: "Error: A trigger type was not found in request" });
 	}
 
@@ -255,7 +246,7 @@ router.get('/queue/:trigger/:instrumentId', bindUserSession, function(req, res, 
 	var valid_triggers = ['stop', 'immediate'];
 	if (valid_triggers.indexOf(req.params.trigger) === -1) return utils.sendJSONResponse(400, res, { error: "trigger must me either stop or immediate" });
 	if (!req.params.instrumentId) {
-		console.log("error: must supply an instrumentId");
+		logger.log('ERROR!', 'No instrumentId was specified');
 		utils.sendJSONResponse(400, res, { error: "must supply an instrumentId" });
 	}
 	trade.findQueuedSellOrderByInstrument(req.rh, req.params.instrumentId, req.params.trigger)
@@ -287,11 +278,9 @@ router.get('/yahoo/:ticker', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	trade.getYahooPrice(req.params.ticker)
 	.then((price) => {
-		console.log(price);
 		utils.sendJSONResponse(200, res, price);
 	})
 	.catch((err) => {
-		console.log(err);
 		utils.sendJSONResponse(500, res, {error: err});
 	});
 });

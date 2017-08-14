@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.8.0
+1.9.0
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -144,6 +144,16 @@ Authorization: Basic 298fhq3rg9h3=
 ```js
 Authorization: Bearer 98h34g98u3g9iwrgijn398
 ```
+
+# Logging
+
+The api application has a built in logging service for basic console logging.  It does not yet support logging levels and all logs will be output unless the logger is not enabled.  Enabling the logging service is done with an environment variable switch in `.env`:
+
+```
+LOGGER=1
+```
+
+(1) is on and (0) is off.
 
 # Continuous Deployment 
 
