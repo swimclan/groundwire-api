@@ -22,14 +22,22 @@ let logger = Logger.getInstance({enabled: process.env.LOGGER == 1});
 let bindUserSession = function(req, res, next) {
 	req.user = !_.isUndefined(userCreds) ? userCreds : utils.authenticatedUser(req);
 	var encodedUser = utils.encodeUser(req.user);
-	req.app.locals.sessions.get(encodedUser)
+	let session_destroy = Promise.resolve();
+	if (_.has(req.user, 'username') && _.has(req.user, 'password')) {
+		logger.log('Destroy session', 'Destroying existing username and password session');
+		session_destroy = req.app.locals.sessions.destroy(encodedUser);
+	}
+	session_destroy.then(function() {
+		return req.app.locals.sessions.get(encodedUser);
+	})
 	.then((options) => {
 		req.rh = options.rh;
 		next();
 	}).catch(() => {
 		new RH(req.user).authenticate(req.user)
-		.then((rh) => {
-			return req.app.locals.sessions.create(encodedUser, {rh: rh.instance});
+		.then((Rh) => {
+			let rh = Rh.instance;
+			return req.app.locals.sessions.create(encodedUser, {rh: rh});
 		})
 		.then((session) => {
 			return session.get(encodedUser);
@@ -59,6 +67,18 @@ router.get('/user', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	trade.getUser(req.rh)
 	.then(function(user) {
+		utils.sendJSONResponse(200, res, user);
+	})
+	.catch(function(err) {
+		utils.sendJSONResponse(500, res, { error: err });
+	});
+});
+
+router.get('/logout', bindUserSession, function(req, res, next) {
+	utils.secure(req, res);
+	trade.expireUser(req.rh)
+	.then(function(user) {
+		req.app.locals.sessions.destroy(utils.encodeUser(user));
 		utils.sendJSONResponse(200, res, user);
 	})
 	.catch(function(err) {

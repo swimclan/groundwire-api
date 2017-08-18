@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.10.0**                      | *Feature*    | Added support for /logout route that forcefully expires an authenticated RH token |
 | **v1.9.0**                       | *Feature*    | Added logging service and robust logging for essential api routes and controllers |
 | **v1.8.0**                       | *Feature*    | Added api route to send currently connected list of socket subscribers |
 | **v1.7.1**                       | *Update*     | Updated Token authentication to use the Bearer standard           |

@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.9.0
+1.10.0
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -28,6 +28,7 @@ The API's service root is at `/v1/` and will run the expressJS app on port 3000.
 | `/v1/cancel`           | DELETE      | * `instrumentId` [RH instrumentID]<br>* `trigger` [stop/immediate] | Cancel any pending market (trigger `immediate`) or stop (trigger `stop`) sell order that is in the queue.  Can be used to move a stop loss position that is managed by RH. |
 | `/v1/holidays`         | GET         | None                              | Returns a JSON list of all market holidays for the current year |
 | `/v1/subscribers`      | GET         | None                              | Returns the current list of connected socket subscribers and which tickers they are subscribed to. |
+| `/v1/logout`           | GET         | None                              | Logs out and expires an authenticated RH auth token.  Renders token unusable thus requiring a new username & password login |
 
 ## Sample API Response
 Here is a sample JSON response that is returned from the GET `/api/price/<ticker>` method:
@@ -144,6 +145,9 @@ Authorization: Basic 298fhq3rg9h3=
 ```js
 Authorization: Bearer 98h34g98u3g9iwrgijn398
 ```
+
+## Logout
+Logging out an existing auth token is supported through the `/logout` route.  Simply make a GET request with the auth_token as the Authorization `Bearer` token and the token will be forcefully expired with Robinhood.  This is helpful to prevent any kind of unwanted distribution or reuse of a token if being stored in a user db.
 
 # Logging
 
