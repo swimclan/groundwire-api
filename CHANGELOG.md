@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.10.1**                      | *Fix*        | Guarding against undefined cursor URLs from orders fetching |
 | **v1.10.0**                      | *Feature*    | Added support for /logout route that forcefully expires an authenticated RH token |
 | **v1.9.0**                       | *Feature*    | Added logging service and robust logging for essential api routes and controllers |
 | **v1.8.0**                       | *Feature*    | Added api route to send currently connected list of socket subscribers |
