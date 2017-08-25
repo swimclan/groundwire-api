@@ -134,6 +134,18 @@ router.get('/orders/:instrumentid', bindUserSession, function(req, res, next) {
 	});
 });
 
+/* GET filled recent orders by instrument */
+router.get('/orders/recent/:instrumentid/:date', bindUserSession, function(req, res, next) {
+	utils.secure(req, res);
+	if (_.isUndefined(req.params.instrumentid)) return utils.sendJSONResponse(400, res, { error: { message: "Must supply a valid instrument id" } });
+	trade.findRecentOrdersByInstrument(req.rh, 'filled', req.params.instrumentid, req.params.date)
+	.then((orders) => {
+		utils.sendJSONResponse(200, res, orders);
+	}).catch((err) => {
+		utils.sendJSONResponse(500, res, { error: err });
+	});
+});
+
 /* GET ticker price */
 router.get('/price/:ticker', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);

@@ -18,7 +18,8 @@ The API's service root is at `/v1/` and will run the expressJS app on port 3000.
 | `/v1/accounts`         | GET         | None                              | Return user's RH account(s) status(es) including account balance |
 | `/v1/positions`        | GET         | None                              | Return user's current RH positions                        |
 | `/v1/queue`            | GET         | None                              | Return user's pending orders                              |
-| `/v1/orders/<instrumentId>` | GET         | None                              | Return user's filled orders for a specific instrumentId |
+| `/v1/orders/<instrumentId>` | GET         | None                         | Return user's filled orders for a specific instrumentId   |
+| `/v1/orders/recent/<instrumentId>/<date>` | GET         | None           | Return user's filled orders for a specific instrumentId and newer than specified date (date is sent in ISO 8601 format)   |
 | `/v1/instrument/<type>/<id>` | GET         | None                        | Get a Robinhood instrument object by sneding either a known instrument id or a ticker symbol. `type` is either `symbol` or `instrument` and `id` is either the ticker symbol or the instrument id (respectively) |
 | `/v1/queue/stop/<instrumentId>`| GET         | None                              | Return user's pending stop sell order for an instrumentId |
 | `/v1/queue/immediate/<instrumentId>`| GET         | None                              | Return user's pending market sell order for an instrumentId |
