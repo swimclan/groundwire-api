@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.11.1**                      | *Feature*    | Upgraded Robinhood API wrapper dependency to 1.1.1 for recent order functionality |
 | **v1.11.0**                      | *Feature*    | Added recent orders method to fetch only orders newer than specified date and for specific instrument |
 | **v1.10.2**                      | *Feature*    | Upgraded Robinhood API wrapper dependency to 1.1.0 for logout functionality |
 | **v1.10.1**                      | *Fix*        | Guarding against undefined cursor URLs from orders fetching |
