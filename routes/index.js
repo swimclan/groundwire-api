@@ -310,7 +310,11 @@ router.get('/yahoo/:ticker', bindUserSession, function(req, res, next) {
 	utils.secure(req, res);
 	trade.getYahooPrice(req.params.ticker)
 	.then((price) => {
-		utils.sendJSONResponse(200, res, price);
+		if (_.has(price, 'warning')) {
+			utils.sendJSONResponse(400, res, price);
+		} else {
+			utils.sendJSONResponse(200, res, price);
+		}
 	})
 	.catch((err) => {
 		utils.sendJSONResponse(500, res, {error: err});

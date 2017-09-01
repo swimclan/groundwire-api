@@ -3,8 +3,8 @@ var utils = require('./lib/utils');
 
 let config = {
     simulate: {
-        tickrate: 500,
-        volatility: 0.0015,
+        tickrate: 300,
+        volatility: 2.5,
         spread: {
             mean: 0.02,
             jitter: 0.0075
@@ -12,14 +12,14 @@ let config = {
         last: {
             probability: 0.1
         },
+        direction: 0.55
     },
     yahoo: {
         url: {
-            root: "http://query.yahooapis.com/v1/public/yql?",
-            query: "select * from yahoo.finance.quotes where symbol in ('$t1')",
-		    diagnostics: "true",
-		    env: "store://datatables.org/alltableswithkeys",
-		    format: "json"
+            root: "https://query2.finance.yahoo.com/v7/finance/quote?",
+            formatted: true,
+            lang: 'en-US',
+            region: 'US'
         }
     },
     tradingEconomics: {
