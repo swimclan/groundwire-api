@@ -23,6 +23,12 @@ module.exports = function(socketsServer) {
         var lastPrice;
         var iterator = new Iterator();
 
+        subscribers.on('boot', function(id) {
+            if (id === socket.id) {
+                socket.disconnect();
+            }
+        });
+
         // Check API KEY and simulation mode to connect sockets
         if (utils.validAPIKey(request)) {
             socket.join(ticker);

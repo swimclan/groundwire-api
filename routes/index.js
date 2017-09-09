@@ -343,4 +343,17 @@ router.get('/subscribers', function(req, res, next) {
 	utils.sendJSONResponse(200, res, subscribers.all());
 });
 
+router.delete('/subscriber', function(req, res, next) {
+	utils.secure(req, res);
+	let target_id;
+	if (_.has(req.body, 'id')) {
+		target_id = req.body.id;
+	} else {
+		return utils.sendJSONResponse(400, res, {error: 'Must supply a valid subscriber id'});
+	}
+	let subscribers = Subscribers.getInstance();
+	subscribers.trigger('boot', target_id);
+	return utils.sendJSONResponse(200, res, {success: `Id ${target_id} was queued for boot out`});
+});
+
 module.exports = router;

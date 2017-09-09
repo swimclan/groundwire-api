@@ -1,6 +1,6 @@
 {
-  "name": "rh-test",
-  "version": "1.12.0",
+  "name": "groundwire-api",
+  "version": "1.13.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
@@ -14,6 +14,7 @@
     "debug": "~2.2.0",
     "dotenv": "^4.0.0",
     "ejs": "~2.3.3",
+    "event-emitter": "^0.3.5",
     "express": "^4.13.4",
     "intrinio-realtime": "^1.0.0",
     "jStat": "^1.5.3",

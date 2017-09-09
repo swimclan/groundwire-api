@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.13.0**                      | *Feature*    | Added a subscriber 'boot' method that kicks out socket clients forcefully by id |
 | **v1.12.0**                      | *Feature*    | Upgraded the simulator and fixed Yahoo price fetches for simulation |
 | **v1.11.1**                      | *Feature*    | Upgraded Robinhood API wrapper dependency to 1.1.1 for recent order functionality |
 | **v1.11.0**                      | *Feature*    | Added recent orders method to fetch only orders newer than specified date and for specific instrument |
