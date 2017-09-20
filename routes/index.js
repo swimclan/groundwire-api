@@ -283,7 +283,8 @@ router.get('/queue/:trigger/:instrumentId', bindUserSession, function(req, res, 
 	}
 	trade.findQueuedSellOrderByInstrument(req.rh, req.params.instrumentId, req.params.trigger)
 	.then(function(stopOrder) {
-		utils.sendJSONResponse(200, res, stopOrder);
+		let ret = [stopOrder];
+		utils.sendJSONResponse(200, res, ret);
 	})
 	.catch(function(err) {
 		utils.sendJSONResponse(500, res, { error: err });

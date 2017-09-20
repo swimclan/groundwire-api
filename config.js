@@ -4,7 +4,7 @@ var utils = require('./lib/utils');
 let config = {
     simulate: {
         tickrate: 300,
-        volatility: 2.5,
+        volatility: 3.5,
         spread: {
             mean: 0.02,
             jitter: 0.0075
@@ -12,7 +12,7 @@ let config = {
         last: {
             probability: 0.1
         },
-        direction: 0.55
+        direction: 0.45
     },
     yahoo: {
         url: {
