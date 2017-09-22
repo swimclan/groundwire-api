@@ -13,7 +13,7 @@ var Subscribers = require('../lib/Subscribers');
 module.exports = function(socketsServer) {
     let subscribers = Subscribers.getInstance();
     socketsServer.sockets.on('connection', function(socket) {
-        subscribers.add({id: socket.client.id, rooms: socket.rooms});
+        subscribers.add({id: socket.client.id});
         console.log("New connection detected");
         console.log("Client id: ", socket.id);
         let ir = new IntrinioRealtime(irCreds);
@@ -27,6 +27,13 @@ module.exports = function(socketsServer) {
             if (id === socket.id) {
                 socket.disconnect();
             }
+        });
+
+        socket.on('tick', function(client) {
+            subscribers.set(client.id, 'symbol', client.tick.ticker);
+            subscribers.set(client.id, 'stop', client.tick.stop);
+            subscribers.set(client.id, 'ask', client.tick.ask);
+            subscribers.set(client.id, 'bid', client.tick.bid);
         });
 
         // Check API KEY and simulation mode to connect sockets

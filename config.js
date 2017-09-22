@@ -3,7 +3,7 @@ var utils = require('./lib/utils');
 
 let config = {
     simulate: {
-        tickrate: 300,
+        tickrate: 2000,
         volatility: 3.5,
         spread: {
             mean: 0.02,
