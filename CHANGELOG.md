@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.14.0**                      | *Feature*    | Postgres database integration and initial create user api route |
 | **v1.13.2**                      | *Feature*    | Subscriber service awareness of client price tracking including current stop |
 | **v1.13.1**                      | *Feature*    | Updated queue route to look for `placed` orders as well as `queued` orders |
 | **v1.13.0**                      | *Feature*    | Added a subscriber 'boot' method that kicks out socket clients forcefully by id |

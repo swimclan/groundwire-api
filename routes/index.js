@@ -10,13 +10,15 @@ var pkg = require('../package.json');
 var _ = require('lodash');
 var Subscribers = require('../lib/Subscribers');
 var Logger = require('../lib/Logger');
+var DB = require('../lib/db');
+var User = require('../models/User');
 try {
 	var userCreds = require('../credentials/robinhood');
 } catch (e) {
 	var userCreds;
 }
 
-let logger = Logger.getInstance({enabled: process.env.LOGGER == 1});
+let logger = Logger.getInstance();
 
 /* MIDDLEWARE */
 let bindUserSession = function(req, res, next) {
@@ -355,6 +357,37 @@ router.delete('/subscriber', function(req, res, next) {
 	let subscribers = Subscribers.getInstance();
 	subscribers.trigger('boot', target_id);
 	return utils.sendJSONResponse(200, res, {success: `Id ${target_id} was queued for boot out`});
+});
+
+router.post('/user/create', function(req, res, next) {
+	utils.secure(req, res);
+	if (
+		!_.has(req.body, 'first') ||
+		!_.has(req.body, 'last') ||
+		!_.has(req.body, 'password') ||
+		!_.has(req.body, 'email')
+	) {
+		return utils.sendJSONResponse(400, res, {error: 'Must supply all user attributes'});
+	}
+	let sql = DB.getInstance().sql;
+	new User(sql).connect()
+	.then((user) => {
+		user.create({
+			firstName: req.body.first,
+			lastName: req.body.last,
+			emailAddress: req.body.email,
+			password: req.body.password
+		});
+		logger.log('User', `Successfully create user: ${req.body.first} ${req.body.last}`, {});
+		return utils.sendJSONResponse(200, res, {user: {
+			firstName: req.body.first,
+			lastName: req.body.last
+		}});
+	})
+	.catch((err) => {
+		logger.log('ERROR!', 'Unable to create a user with those attributes', {});
+		return utils.sendJSONResponse(500, res, {error: err});
+	});
 });
 
 module.exports = router;

@@ -2,6 +2,18 @@
 var utils = require('./lib/utils');
 
 let config = {
+    db: {
+        production: {
+            host: 'api.groundwire.co',
+            port: 5432,
+            dbname: 'Groundwire',
+        },
+        development: {
+            host: 'localhost',
+            port: 5432,
+            dbname: 'Groundwire',
+        }
+    },
     simulate: {
         tickrate: 2000,
         volatility: 3.5,
