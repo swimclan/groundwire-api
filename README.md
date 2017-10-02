@@ -31,6 +31,7 @@ The API's service root is at `/v1/` and will run the expressJS app on port 3000.
 | `/v1/subscribers`      | GET         | None                              | Returns the current list of connected socket clients and which tickers they are subscribed to as well as what the current stop loss is set to for that ticker. |
 | `/v1/subscriber`       | DELETE      | * `id` [socket client id]         | Forcefully removes a client connection to the socket by supplying a socket client id |
 | `/v1/logout`           | GET         | None                              | Logs out and expires an authenticated RH auth token.  Renders token unusable thus requiring a new username & password login |
+| `/v1/user/create`      | POST        | * `first`<br>* `last`<br>* `email`<br>* `password`<br> | Creates a user in the database for Groundwire (not Robinhood).  For testing purposes only and will be depricated |
 
 ## Sample API Response
 Here is a sample JSON response that is returned from the GET `/api/price/<ticker>` method:
