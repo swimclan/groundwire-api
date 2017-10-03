@@ -4,7 +4,7 @@ var utils = require('./lib/utils');
 let config = {
     db: {
         production: {
-            host: 'localhost',
+            host: 'pgsql',
             port: 5432,
             dbname: 'Groundwire',
         },
