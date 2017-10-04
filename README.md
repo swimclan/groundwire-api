@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.14.0
+1.15.0
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -31,7 +31,7 @@ The API's service root is at `/v1/` and will run the expressJS app on port 3000.
 | `/v1/subscribers`      | GET         | None                              | Returns the current list of connected socket clients and which tickers they are subscribed to as well as what the current stop loss is set to for that ticker. |
 | `/v1/subscriber`       | DELETE      | * `id` [socket client id]         | Forcefully removes a client connection to the socket by supplying a socket client id |
 | `/v1/logout`           | GET         | None                              | Logs out and expires an authenticated RH auth token.  Renders token unusable thus requiring a new username & password login |
-| `/v1/user/create`      | POST        | * `first`<br>* `last`<br>* `email`<br>* `password`<br> | Creates a user in the database for Groundwire (not Robinhood).  For testing purposes only and will be depricated |
+| `/v1/user/create`      | POST        | * `first`<br>* `last`<br>* `email`<br>* `password`<br> | Creates a user in the database for Groundwire (not Robinhood).  Hashes the password for security purposes |
 
 ## Sample API Response
 Here is a sample JSON response that is returned from the GET `/api/price/<ticker>` method:

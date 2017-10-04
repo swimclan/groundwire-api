@@ -4,7 +4,10 @@ var favicon = require('serve-favicon');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var Sessions = require('./lib/Sessions');
+var session = require('express-session');
+var passport = require('passport');
 var DB = require('./lib/db');
+var UserModel = require('./models/User');
 require('dotenv').config();
 var config = require('./config');
 var Logger = require('./lib/Logger');
@@ -39,10 +42,22 @@ app.set('view engine', 'ejs');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(bodyParser.json());
+app.use(require('connect-multiparty')());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(require('less-middleware')(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({ secret: process.env.SESSION_SECRET }));
+
+// Setup passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+var User = new UserModel(DB);
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.use('/v1', routes);
 app.use('/stream', streams);

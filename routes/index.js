@@ -10,7 +10,7 @@ var pkg = require('../package.json');
 var _ = require('lodash');
 var Subscribers = require('../lib/Subscribers');
 var Logger = require('../lib/Logger');
-var DB = require('../lib/db');
+var db = require('../lib/db');
 var User = require('../models/User');
 try {
 	var userCreds = require('../credentials/robinhood');
@@ -369,24 +369,18 @@ router.post('/user/create', function(req, res, next) {
 	) {
 		return utils.sendJSONResponse(400, res, {error: 'Must supply all user attributes'});
 	}
-	let sql = DB.getInstance().sql;
-	new User(sql).connect()
-	.then((user) => {
-		user.create({
-			firstName: req.body.first,
-			lastName: req.body.last,
-			emailAddress: req.body.email,
-			password: req.body.password
-		});
+	let user = new User(db)
+	user.register({
+		firstName: req.body.first,
+		lastName: req.body.last,
+		emailAddress: req.body.email},
+		req.body.password, function(err, user) {
+		if (err) {
+			logger.log('ERROR!', 'Unable to create a user with those attributes', {});
+			return utils.sendJSONResponse(500, res, {error: err});				
+		}
 		logger.log('User', `Successfully create user: ${req.body.first} ${req.body.last}`, {});
-		return utils.sendJSONResponse(200, res, {user: {
-			firstName: req.body.first,
-			lastName: req.body.last
-		}});
-	})
-	.catch((err) => {
-		logger.log('ERROR!', 'Unable to create a user with those attributes', {});
-		return utils.sendJSONResponse(500, res, {error: err});
+		return utils.sendJSONResponse(200, res, user);			
 	});
 });
 
