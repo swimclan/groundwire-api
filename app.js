@@ -21,19 +21,21 @@ var app = express();
 var logger = Logger.getInstance({enabled: process.env.LOGGER == 1});
 
 // setup db connection
-DB.getInstance({
-  host: config.get(`db.${process.env.NODE_ENV}.host`),
-  port: config.get(`db.${process.env.NODE_ENV}.port`),
-  dbname: config.get(`db.${process.env.NODE_ENV}.dbname`),
-  user: process.env.DB_USER ? process.env.DB_USER : '',
-  pass: process.env.DB_PASS ? process.env.DB_PASS : ''
-}).connect()
-.then(() => {
-  logger.log('DB', 'Connection successful', {})
-})
-.catch((err) => {
-  logger.log('ERROR!', 'Connection failed with error', {error: err})
-});
+if (process.env.USER_DB_MASTER_SWITCH !== '0'){
+  DB.getInstance({
+    host: config.get(`db.${process.env.NODE_ENV}.host`),
+    port: config.get(`db.${process.env.NODE_ENV}.port`),
+    dbname: config.get(`db.${process.env.NODE_ENV}.dbname`),
+    user: process.env.DB_USER ? process.env.DB_USER : '',
+    pass: process.env.DB_PASS ? process.env.DB_PASS : ''
+  }).connect()
+  .then(() => {
+    logger.log('DB', 'Connection successful', {})
+  })
+  .catch((err) => {
+    logger.log('ERROR!', 'Connection failed with error', {error: err})
+  });
+}
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -50,14 +52,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: process.env.SESSION_SECRET }));
 
 // Setup passport middleware
-app.use(passport.initialize());
-app.use(passport.session());
-
-var User = new UserModel(DB);
-passport.use(User.createStrategy());
-
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+if (process.env.USER_DB_MASTER_SWITCH !== '0') {
+  app.use(passport.initialize());
+  app.use(passport.session());
+  
+  var User = new UserModel(DB);
+  passport.use(User.createStrategy());
+  
+  passport.serializeUser(User.serializeUser());
+  passport.deserializeUser(User.deserializeUser());
+}
 
 app.use('/v1', routes);
 app.use('/stream', streams);
