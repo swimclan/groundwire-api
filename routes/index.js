@@ -1,6 +1,7 @@
 'use strict';
 
 var express = require('express');
+var passport = require('passport');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var trade = require('../lib/trading');
@@ -359,7 +360,7 @@ router.delete('/subscriber', function(req, res, next) {
 	return utils.sendJSONResponse(200, res, {success: `Id ${target_id} was queued for boot out`});
 });
 
-router.post('/user/create', function(req, res, next) {
+router.post('/user/register', function(req, res, next) {
 	utils.secure(req, res);
 	if (
 		!_.has(req.body, 'first') ||
@@ -382,6 +383,11 @@ router.post('/user/create', function(req, res, next) {
 		logger.log('User', `Successfully create user: ${req.body.first} ${req.body.last}`, {});
 		return utils.sendJSONResponse(200, res, user);			
 	});
+});
+
+router.post('/user/login', passport.authenticate('local'), function(req, res, next) {
+	logger.log('Login', 'Login attempt with the following credentials', req.body);
+	res.sendStatus(200);
 });
 
 module.exports = router;

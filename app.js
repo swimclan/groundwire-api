@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var Sessions = require('./lib/Sessions');
 var session = require('express-session');
+var cors = require('cors');
 var passport = require('passport');
 var DB = require('./lib/db');
 var UserModel = require('./models/User');
@@ -49,7 +50,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(require('less-middleware')(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: process.env.SESSION_SECRET }));
+app.use(cors());
+
+app.use(session({
+  cookie : {
+  maxAge: 3600000,
+  secure: true
+},
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true
+}));
 
 // Setup passport middleware
 if (process.env.USER_DB_MASTER_SWITCH !== '0') {
