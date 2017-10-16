@@ -53,7 +53,20 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(require('less-middleware')(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors());
+
+// Configure CORS
+var subhost = config.get('requestOrigin.' + process.env.NODE_ENV + '.subhost');
+var domain = config.get('requestOrigin.' + process.env.NODE_ENV + '.domain');
+var port = config.get('requestOrigin.' + process.env.NODE_ENV + '.port');
+var protocol = port != 443 ? 'http://' : 'https://';
+port = port === 80 || port === 443 ? null : port;
+var origin = protocol + subhost + (subhost.length > 0 ? '.' : '') + domain + (port ? ':' : '') + port;
+var corsOptions = {
+  origin: origin,
+  credentials: true,
+  optionsSuccessStatus: 200
+}
+app.use(cors(corsOptions));
 
 // Configure express-session store
 var sessionStore   = new session.MemoryStore({ reapInterval: 60000 * 10 });
@@ -66,7 +79,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   key: 'user_sid',
   resave: true,
-  saveUninitialized: false
+  saveUninitialized: true
 }));
 
 // Setup passport middleware
