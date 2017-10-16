@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.15.3**                      | *Update*     | Improved login service and introduced memory store for user sessions |
 | **v1.15.2**                      | *Feature*    | Passport user login route with DB integration |
 | **v1.15.1**                      | *Feature*    | Implemented user db master switch to prevent db connection errors when no db exists |
 | **v1.15.0**                      | *Feature*    | Passport user registration route with postgres integration        |

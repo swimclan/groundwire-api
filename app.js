@@ -12,6 +12,8 @@ var UserModel = require('./models/User');
 require('dotenv').config();
 var config = require('./config');
 var Logger = require('./lib/Logger');
+var morgan = require('morgan');
+var _ = require('lodash');
 
 var routes = require('./routes/index');
 var streams = require('./streams/index');
@@ -48,18 +50,23 @@ app.use(bodyParser.json());
 app.use(require('connect-multiparty')());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(morgan('dev'));
 app.use(require('less-middleware')(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
+// Configure express-session store
+var sessionStore   = new session.MemoryStore({ reapInterval: 60000 * 10 });
 app.use(session({
-  cookie : {
-  maxAge: 3600000,
-  secure: true
-},
+  cookie : _.merge({}, config.get('session.cookie'),
+      {
+        domain: config.get('domain.' + process.env.NODE_ENV),
+        store: sessionStore
+      }),
   secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true
+  key: 'user_sid',
+  resave: true,
+  saveUninitialized: false
 }));
 
 // Setup passport middleware

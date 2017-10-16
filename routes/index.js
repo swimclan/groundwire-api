@@ -370,7 +370,7 @@ router.post('/user/register', function(req, res, next) {
 	) {
 		return utils.sendJSONResponse(400, res, {error: 'Must supply all user attributes'});
 	}
-	let user = new User(db)
+	let user = new User(db);
 	user.register({
 		firstName: req.body.first,
 		lastName: req.body.last,
@@ -385,9 +385,27 @@ router.post('/user/register', function(req, res, next) {
 	});
 });
 
-router.post('/user/login', passport.authenticate('local'), function(req, res, next) {
-	logger.log('Login', 'Login attempt with the following credentials', req.body);
-	res.sendStatus(200);
+router.post('/user/login', function(req, res, next) {
+	logger.log('Login', 'Login attempt with the following credential', {emailAddress: req.body.emailAddress});
+	passport.authenticate('local', {}, function(err, user, info) {
+		if (err) {
+			logger.log('ERROR!', 'An error occured on the authenticate routine.', {error: err});
+			return res.status(500).send(err);
+		} else if (!user) {
+			logger.log('Login', 'Login failed', info);
+			return res.status(401).send(info);
+		}
+		req.login(user, function(err) {
+			if (err) {
+				logger.log('ERROR!', 'An error occured on the login routine.', err);
+				return res.status(400).send(err);
+			} else {
+				logger.log('Login', 'Login was successful for the following user', user.dataValues);
+				return res.status(200).send(user);
+			}
+		})
+
+	})(req, res, next);
 });
 
 module.exports = router;

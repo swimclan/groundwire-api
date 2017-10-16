@@ -2,6 +2,16 @@
 var utils = require('./lib/utils');
 
 let config = {
+    domain: {
+        production: '.groundwire.co',
+        development: '127.0.0.1:8080'
+    },
+    session: {
+        cookie: {
+            expires: 3600000,
+            secure: false,
+        }
+    },
     db: {
         production: {
             host: 'db.groundwire.co',
