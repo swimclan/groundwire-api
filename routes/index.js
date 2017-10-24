@@ -401,11 +401,23 @@ router.post('/user/login', function(req, res, next) {
 				return res.status(400).send(err);
 			} else {
 				logger.log('Login', 'Login was successful for the following user', user.dataValues);
-				return res.status(200).send(user);
+				return res.status(200).send('OK');
 			}
 		})
 
 	})(req, res, next);
+});
+
+router.get('/user/check', function(req, res, next) {
+	utils.sendJSONResponse(200, res, {authorized: !_.isUndefined(req.session.passport)});
+});
+
+router.get('/user/logout', function(req, res, next) {
+	if (!_.isUndefined(req.session)) {
+		req.session.destroy();
+	}
+	utils.sendJSONResponse(200, res, {destroyed: true});
+	
 });
 
 module.exports = router;

@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.16.0**                      | *Feature*    | Groundiwre user authentication check and logout routes            |
 | **v1.15.4**                      | *Update*     | Configured cors to allow specific request origin and added origin domains to config |
 | **v1.15.3**                      | *Update*     | Improved login service and introduced memory store for user sessions |
 | **v1.15.2**                      | *Feature*    | Passport user login route with DB integration |

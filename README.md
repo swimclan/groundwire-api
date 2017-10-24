@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.15.2
+1.16.0
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -33,6 +33,8 @@ The API's service root is at `/v1/` and will run the expressJS app on port 3000.
 | `/v1/logout`           | GET         | None                              | Logs out and expires an authenticated RH auth token.  Renders token unusable thus requiring a new username & password login |
 | `/v1/user/register`      | POST        | * `first`<br>* `last`<br>* `email`<br>* `password`<br> | Creates a user in the database for Groundwire (not Robinhood).  Hashes the password for security purposes |
 | `/v1/user/login`| POST        | * `emailAddress` [string]<br>* `password` [string] | Login to GroundWire Account.  Returns 200 `OK` if successful or 401 `Unauthorized` if unsuccessful |
+| `/v1/user/check`       | GET         | None                              | Session check service Returns 200 `{"authorized": true}` if valid session or  `{"authorized": false}` if invalid session |
+| `/v1/user/logout`      | GET         | None                              | Destroys the session via the request cookie (logs the user out).  Route returns `{}` |
 ## Sample API Response
 Here is a sample JSON response that is returned from the GET `/api/price/<ticker>` method:
 ```js
