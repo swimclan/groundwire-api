@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.16.0
+1.17.0
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -35,6 +35,7 @@ The API's service root is at `/v1/` and will run the expressJS app on port 3000.
 | `/v1/user/login`| POST        | * `emailAddress` [string]<br>* `password` [string] | Login to GroundWire Account.  Returns 200 `OK` if successful or 401 `Unauthorized` if unsuccessful |
 | `/v1/user/check`       | GET         | None                              | Session check service Returns 200 `{"authorized": true}` if valid session or  `{"authorized": false}` if invalid session |
 | `/v1/user/logout`      | GET         | None                              | Destroys the session via the request cookie (logs the user out).  Route returns `{}` |
+| `/v1/user/tokenize`    | GET         | None                              | Sets the Robinhood auth token in the db for Groundwire users sending Robinhood credentials to the api |
 ## Sample API Response
 Here is a sample JSON response that is returned from the GET `/api/price/<ticker>` method:
 ```js
@@ -103,10 +104,14 @@ Web socket will support a `simulate` mode which will simulate the price action o
 
 Simulations will use the latest Yahoo price for the incoming requested ticker symbol and **will not** spawn a connection to the Intrinio IEX stream.
 
+# Groundwire Front End
+
+This api application also supports calls being made from the Groundwire front end trading admin application.  These routes are used exclusively for the purpose of managing the user interaction on the front end and integrate with a PostgreSQL database to store data like user credentials, Robinhood auth tokens and other user preferences related to the the trading strategy.
+
 # Security
 
 ## API Key
-API key is required on calls to all API methods and websocket.  A `key=<value>` parameter must be included on the query string of all requests to the API and websocket:
+API key is required on calls to all API methods and websocket (except for the groundwire front end app calls).  A `key=<value>` parameter must be included on the query string of all requests to the API and websocket:
 
 | Endpoint Type | API Key Delivery                         |
 | --- | -------------------------------------------------- |

@@ -13,6 +13,7 @@ var Subscribers = require('../lib/Subscribers');
 var Logger = require('../lib/Logger');
 var db = require('../lib/db');
 var User = require('../models/User');
+var Token = require('../models/Token');
 try {
 	var userCreds = require('../credentials/robinhood');
 } catch (e) {
@@ -418,6 +419,58 @@ router.get('/user/logout', function(req, res, next) {
 	}
 	utils.sendJSONResponse(200, res, {destroyed: true});
 	
+});
+
+router.get('/user/tokenize', bindUserSession, function(req, res, next) {
+	let userId;
+	let session = req.session.passport;
+	if (_.isUndefined(session)) {
+		return utils.sendJSONResponse(401, res, {error: 'No authorized session detected'});
+	}
+	// Connect DB models
+	let UserModel = new User(db);
+	let TokenModel = new Token(db);
+	// 1. Find the user with session id
+	UserModel.findOne({where: { emailAddress: session.user }}).then(function(user) {
+		return user.id;
+	}).catch(function(err) {
+		logger.log('ERROR!', 'There was an error in fetching the user from db', {error: err});
+		utils.sendJSONResponse(500, res, {error: err});
+	}).then(function(id) {
+		// 2. Find the RH user token from the creds passed in the header (through bind session)
+		if (id) {
+			userId = id;
+			return trade.getUser(req.rh);
+		}
+		return null;
+	}).catch(function(err) {
+		logger.log('ERROR!', 'There was an error in fetching the user from Robinhood', {error: err});
+		utils.sendJSONResponse(500, res, {error: err});
+	}).then(function(rhuser) {
+		// 3. Check to see if token exists for user
+		if (rhuser && rhuser.auth_token) {
+			return TokenModel.findCreateFind({
+				where: {
+					userId: userId
+				},
+				defaults: {
+					authToken: rhuser.auth_token,
+				}
+			});
+		}
+		return utils.sendJSONResponse(401, res, {error: 'Invalid Robinhood credentials'});
+	}).catch(function(err) {
+		logger.log('ERROR!', 'There was an error fetching token from db', {error: err});
+		return utils.sendJSONResponse(500, res, {error: err});
+	}).then(function([token, created]) {
+		if (token && created !== null && !_.isUndefined(created)) {
+			logger.log('Token', `${created ? 'Created a new' : 'Found and updated a'} RH auth token for user: ${userId}`, {token: token});
+			return utils.sendJSONResponse(200, res, {token: token});
+		}
+		return null
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Something went wrong.', {error: err});
+	});
 });
 
 module.exports = router;

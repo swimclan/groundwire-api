@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.17.0**                      | *Feature*    | Groundwire tokenize route to handle robinhood auth token for front end |
 | **v1.16.0**                      | *Feature*    | Groundiwre user authentication check and logout routes            |
 | **v1.15.4**                      | *Update*     | Configured cors to allow specific request origin and added origin domains to config |
 | **v1.15.3**                      | *Update*     | Improved login service and introduced memory store for user sessions |
