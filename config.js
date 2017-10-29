@@ -4,13 +4,15 @@ var utils = require('./lib/utils');
 let config = {
   requestOrigin: {
     production: {
+      protocol: 'https',
       subhost: '',
-      domain: '127.0.0.1',
+      domain: 'admin.groundwire.co',
       port: 8080
     },
     development: {
+      protocol: 'https',
       subhost: '',
-      domain: '127.0.0.1',
+      domain: 'admin.groundwire.co',
       port: 8080
     }
   },

@@ -26,7 +26,7 @@ var logger = Logger.getInstance({enabled: process.env.LOGGER == 1});
 // setup db connection
 if (process.env.USER_DB_MASTER_SWITCH !== '0'){
   DB.getInstance({
-    host: config.get(`db.${process.env.NODE_ENV}.host`),
+    host: process.env.DB_HOST,
     port: config.get(`db.${process.env.NODE_ENV}.port`),
     dbname: config.get(`db.${process.env.NODE_ENV}.dbname`),
     user: process.env.DB_USER ? process.env.DB_USER : '',
@@ -58,7 +58,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 var subhost = config.get('requestOrigin.' + process.env.NODE_ENV + '.subhost');
 var domain = config.get('requestOrigin.' + process.env.NODE_ENV + '.domain');
 var port = config.get('requestOrigin.' + process.env.NODE_ENV + '.port');
-var protocol = port != 443 ? 'http://' : 'https://';
+var protocol = config.get('requestOrigin.' + process.env.NODE_ENV + '.protocol') + '://';
 port = port === 80 || port === 443 ? null : port;
 var origin = protocol + subhost + (subhost.length > 0 ? '.' : '') + domain + (port ? ':' : '') + port;
 var corsOptions = {

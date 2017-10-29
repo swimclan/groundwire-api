@@ -56,7 +56,7 @@ let bindUserSession = function(req, res, next) {
 /* ROUTES */
 /* GET investor profile */
 router.get('/', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	trade.getProfile(req.rh)
 	.then(function(profile) {
 		utils.sendJSONResponse(200, res, profile);
@@ -68,7 +68,7 @@ router.get('/', bindUserSession, function(req, res, next) {
 
 /* GET user profile */
 router.get('/user', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	trade.getUser(req.rh)
 	.then(function(user) {
 		utils.sendJSONResponse(200, res, user);
@@ -79,7 +79,7 @@ router.get('/user', bindUserSession, function(req, res, next) {
 });
 
 router.get('/logout', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	trade.expireUser(req.rh)
 	.then(function(user) {
 		req.app.locals.sessions.destroy(utils.encodeUser(user));
@@ -92,7 +92,7 @@ router.get('/logout', bindUserSession, function(req, res, next) {
 
 /* GET user account */
 router.get('/accounts', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	trade.getAccounts(req.rh)
 	.then(function(account) {
 		utils.sendJSONResponse(200, res, account);
@@ -104,7 +104,7 @@ router.get('/accounts', bindUserSession, function(req, res, next) {
 
 /* GET positions */
 router.get('/positions', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	trade.getPositions(req.rh)
 	.then(function(positions) {
 		utils.sendJSONResponse(200, res, positions);
@@ -116,7 +116,7 @@ router.get('/positions', bindUserSession, function(req, res, next) {
 
 /* GET queued orders */
 router.get('/queue', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	trade.findOrdersByInstrument(req.rh, 'queued')
 	.then(function(orders) {
 		utils.sendJSONResponse(200, res, orders);
@@ -128,7 +128,7 @@ router.get('/queue', bindUserSession, function(req, res, next) {
 
 /* GET filled orders by instrument */
 router.get('/orders/:instrumentid', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	if (_.isUndefined(req.params.instrumentid)) return utils.sendJSONResponse(400, res, { error: { message: "Must supply a valid instrument id" } });
 	trade.findOrdersByInstrument(req.rh, 'filled', req.params.instrumentid)
 	.then((orders) => {
@@ -140,7 +140,7 @@ router.get('/orders/:instrumentid', bindUserSession, function(req, res, next) {
 
 /* GET filled recent orders by instrument */
 router.get('/orders/recent/:instrumentid/:date', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	if (_.isUndefined(req.params.instrumentid)) return utils.sendJSONResponse(400, res, { error: { message: "Must supply a valid instrument id" } });
 	trade.findRecentOrdersByInstrument(req.rh, 'filled', req.params.instrumentid, req.params.date)
 	.then((orders) => {
@@ -152,7 +152,7 @@ router.get('/orders/recent/:instrumentid/:date', bindUserSession, function(req, 
 
 /* GET ticker price */
 router.get('/price/:ticker', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	var ticker = req.params.ticker;
 	trade.getPrice(req.rh, ticker)
  	.then(function(data) {
@@ -165,7 +165,7 @@ router.get('/price/:ticker', bindUserSession, function(req, res, next) {
 
 /* GET watchlists */
 router.get('/watchlist', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	trade.getWatchList(req.rh)
 	.then(function(watchlist) {
 		utils.sendJSONResponse(200, res, watchlist);
@@ -177,7 +177,7 @@ router.get('/watchlist', bindUserSession, function(req, res, next) {
 
 /* POST place buy order  */
 router.post('/trade', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	var reqBody = req.body;
 	if (!reqBody.type) {
 		logger.log('ERROR!', 'No trade type was specified');
@@ -234,7 +234,7 @@ router.post('/trade', bindUserSession, function(req, res, next) {
 
 /* DELETE cancel queued stop sell */
 router.delete('/cancel', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	var reqBody = req.body;
 	if (Object.keys(reqBody).indexOf("instrumentId") === -1) {
 		logger.log('ERROR!', 'An instrument ID was not found in request');
@@ -278,7 +278,7 @@ router.get('/auth', bindUserSession, function(req, res, next) {
 });
 
 router.get('/queue/:trigger/:instrumentId', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	var valid_triggers = ['stop', 'immediate'];
 	if (valid_triggers.indexOf(req.params.trigger) === -1) return utils.sendJSONResponse(400, res, { error: "trigger must me either stop or immediate" });
 	if (!req.params.instrumentId) {
@@ -296,7 +296,7 @@ router.get('/queue/:trigger/:instrumentId', bindUserSession, function(req, res, 
 });
 
 router.get('/instrument/:type/:id', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	let validTypes = ['symbol', 'instrument'];
 	if (!utils.inArray(req.params.type, validTypes)) {
 		return utils.sendJSONResponse(400, res, {error: "must supply a valid type"});
@@ -312,7 +312,7 @@ router.get('/instrument/:type/:id', bindUserSession, function(req, res, next) {
 });
 
 router.get('/yahoo/:ticker', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	trade.getYahooPrice(req.params.ticker)
 	.then((price) => {
 		if (_.has(price, 'warning')) {
@@ -327,7 +327,7 @@ router.get('/yahoo/:ticker', bindUserSession, function(req, res, next) {
 });
 
 router.get('/holidays', bindUserSession, function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	trade.getCalendar()
 	.then((calendar) => {
 		return utils.sendJSONResponse(200, res, calendar);
@@ -343,13 +343,13 @@ router.get('/version', function(req, res, next) {
 });
 
 router.get('/subscribers', function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	let subscribers = Subscribers.getInstance();
 	utils.sendJSONResponse(200, res, subscribers.all());
 });
 
 router.delete('/subscriber', function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	let target_id;
 	if (_.has(req.body, 'id')) {
 		target_id = req.body.id;
@@ -362,7 +362,7 @@ router.delete('/subscriber', function(req, res, next) {
 });
 
 router.post('/user/register', function(req, res, next) {
-	utils.secure(req, res);
+	if (!utils.secure(req, res)) return;
 	if (
 		!_.has(req.body, 'first') ||
 		!_.has(req.body, 'last') ||
@@ -464,7 +464,8 @@ router.get('/user/tokenize', bindUserSession, function(req, res, next) {
 		return utils.sendJSONResponse(500, res, {error: err});
 	}).then(function([token, created]) {
 		if (token && created !== null && !_.isUndefined(created)) {
-			logger.log('Token', `${created ? 'Created a new' : 'Found and updated a'} RH auth token for user: ${userId}`, {token: token});
+			let prefix = created ? 'Created a new' : 'Found and updated a';
+			logger.log('Token', `${prefix} RH auth token for user: ${userId}`, {token: token});
 			return utils.sendJSONResponse(200, res, {token: token});
 		}
 		return null
