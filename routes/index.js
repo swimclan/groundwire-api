@@ -410,7 +410,44 @@ router.post('/user/login', function(req, res, next) {
 });
 
 router.get('/user/check', function(req, res, next) {
-	utils.sendJSONResponse(200, res, {authorized: !_.isUndefined(req.session.passport)});
+	let ret = {
+		authorized: false,
+		user: null,
+		connected: false
+	};
+	const session = req.session.passport;
+	let valid_session = !_.isUndefined(session);
+	if (!valid_session) {
+		return utils.sendJSONResponse(200, res, ret);
+	}
+	const TokenModel = new Token(db);
+	const UserModel = new User(db);
+	ret.authorized = true;
+	UserModel.findOne({
+		where: {
+			emailAddress: session.user
+		}
+	}).then((user) => {
+		if (user && user.id) {
+			ret.user = user.emailAddress;
+			return TokenModel.findOne({
+				where: {
+					active: true,
+					userId: user.id
+				}
+			});
+		}
+		return null;
+	}).catch((err) => {
+		logger.log('ERROR!', 'There was an error fetching user from the db', {error: err});
+	}).then((token) => {
+			logger.log('Token check', 'Token lookup complete.  Value of token is:', {token: token});
+			ret.connected = !_.isUndefined(token) && token !== null;
+			return utils.sendJSONResponse(200, res, ret);
+	}).catch((err) => {
+		logger.log('ERROR!', 'There was an error fetching token from the db', {error: err});
+		return utils.sendJSONResponse(500, res, {error: err});
+	});
 });
 
 router.get('/user/logout', function(req, res, next) {
@@ -418,7 +455,6 @@ router.get('/user/logout', function(req, res, next) {
 		req.session.destroy();
 	}
 	utils.sendJSONResponse(200, res, {destroyed: true});
-	
 });
 
 router.get('/user/tokenize', bindUserSession, function(req, res, next) {
@@ -455,6 +491,7 @@ router.get('/user/tokenize', bindUserSession, function(req, res, next) {
 				},
 				defaults: {
 					authToken: rhuser.auth_token,
+					active: !_.isUndefined(rhuser.auth_token)
 				}
 			});
 		}

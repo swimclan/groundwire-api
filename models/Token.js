@@ -12,6 +12,9 @@ class Token extends Model {
       authToken: {
         type: Sequelize.STRING
       },
+      active: {
+        type: Sequelize.BOOLEAN
+      },
       userId: {
         type: Sequelize.INTEGER,
         references: {
