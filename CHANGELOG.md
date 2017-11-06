@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.18.1**                      | *Fix*        | Fixed bug in loggedIn utils check so it returns a valid session if successful |
 | **v1.18.0**                      | *Feature*    | Strategies table and api endpoint for getting and saving new strategies |
 | **v1.17.2**                      | *Update*     | Updated user check route to also check for valid robinhood token  |
 | **v1.17.1**                      | *Fix*        | Fixed api key checker from issuing multiple responses and other misc bug fixes |

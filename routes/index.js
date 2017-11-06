@@ -459,7 +459,8 @@ router.get('/user/logout', function(req, res, next) {
 });
 
 router.get('/user/tokenize', bindUserSession, function(req, res, next) {
-	if (!utils.loggedIn(req, res)) return;
+	let session = utils.loggedIn(req, res);
+	if (!session) return;
 	let userId;
 	// Connect DB models
 	let UserModel = new User(db);
