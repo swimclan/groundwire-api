@@ -14,6 +14,7 @@ var Logger = require('../lib/Logger');
 var db = require('../lib/db');
 var User = require('../models/User');
 var Token = require('../models/Token');
+var Strategy = require('../models/Strategy');
 try {
 	var userCreds = require('../credentials/robinhood');
 } catch (e) {
@@ -458,11 +459,8 @@ router.get('/user/logout', function(req, res, next) {
 });
 
 router.get('/user/tokenize', bindUserSession, function(req, res, next) {
+	if (!utils.loggedIn(req, res)) return;
 	let userId;
-	let session = req.session.passport;
-	if (_.isUndefined(session)) {
-		return utils.sendJSONResponse(401, res, {error: 'No authorized session detected'});
-	}
 	// Connect DB models
 	let UserModel = new User(db);
 	let TokenModel = new Token(db);
@@ -508,6 +506,36 @@ router.get('/user/tokenize', bindUserSession, function(req, res, next) {
 		return null
 	}).catch(function(err) {
 		logger.log('ERROR!', 'Something went wrong.', {error: err});
+	});
+});
+
+router.post('/strategy', function(req, res, next) {
+	if (!utils.secure(req, res)) return;
+	if (!utils.loggedIn(req, res)) return;
+	if (_.isUndefined(req.body.name)) {
+		logger.log('ERROR!', 'No strategy name was sent in the request.  Please try again.', {});
+		return utils.sendJSONResponse(400, res, {error: 'No strategy name was sent in the request.  Please try again.'});
+	}
+	logger.log('Strategy create', 'About to create a new strategy', {name: req.body.name, active: true});
+	let StrategyModel = new Strategy(db);
+	StrategyModel.create({name: req.body.name, active: true}).then(function(strategy) {
+		logger.log('Strategy create', 'Strategy successfully created', strategy);
+		utils.sendJSONResponse(200, res, strategy);
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Something failed when creating new strategy item', {error: err});
+		utils.sendJSONResponse(500, res, {error: err});
+	});
+});
+
+router.get('/strategy', function(req, res, next) {
+	if (!utils.loggedIn(req, res)) return;
+	let StrategyModel = new Strategy(db);
+	StrategyModel.findAll({where: { active: true }}).then(function(strategies) {
+		logger.log('Get strategies', 'Successfully fetched all active strategies', {strategies: strategies});
+		utils.sendJSONResponse(200, res, strategies);
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Something went wrong when fetching all strategies', {error: err});
+		utils.sendJSONResponse(500, res, {error: err});
 	});
 });
 

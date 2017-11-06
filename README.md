@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.17.2
+1.18.0
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -36,6 +36,9 @@ The API's service root is at `/v1/` and will run the expressJS app on port 3000.
 | `/v1/user/check`       | GET         | None                              | Session check service Returns 200 `{"authorized": true}` if valid session or  `{"authorized": false}` if invalid session |
 | `/v1/user/logout`      | GET         | None                              | Destroys the session via the request cookie (logs the user out).  Route returns `{}` |
 | `/v1/user/tokenize`    | GET         | None                              | Sets the Robinhood auth token in the db for Groundwire users sending Robinhood credentials to the api |
+| `/v1/strategy`         | GET         | None                              | Gets the current list of active strategies for the front end app |
+| `/v1/strategy`         | POST        | * `name` [string]                 | Creates a new strategy for front end consumption in preferences and sets it to active |
+
 ## Sample API Response
 Here is a sample JSON response that is returned from the GET `/api/price/<ticker>` method:
 ```js
