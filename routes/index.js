@@ -15,6 +15,7 @@ var db = require('../lib/db');
 var User = require('../models/User');
 var Token = require('../models/Token');
 var Strategy = require('../models/Strategy');
+var Preference = require('../models/Preference');
 try {
 	var userCreds = require('../credentials/robinhood');
 } catch (e) {
@@ -537,6 +538,88 @@ router.get('/strategy', function(req, res, next) {
 	}).catch(function(err) {
 		logger.log('ERROR!', 'Something went wrong when fetching all strategies', {error: err});
 		utils.sendJSONResponse(500, res, {error: err});
+	});
+});
+
+router.post('/preferences', function(req, res, next) {
+	let session = utils.loggedIn(req, res);
+	if (!session) return;
+	logger.log('Create preference', `Creating a new preference for ${session.user}`, {user: session.user});
+	let PreferenceModel = new Preference(db);
+	let UserModel = new User(db);
+	const requiredProps = PreferenceModel.attributes;
+	UserModel.findOne({where: {emailAddress: session.user}}).then(function(user) {
+		return user.id
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Unable to retrieve the user for the logged in session', {error: err});
+		utils.sendJSONResponse(500, res, {error: err});
+	}).then(function(userId) {
+		req.body.userId = userId;
+		let incomingKeys = Object.keys(req.body);
+		if (!_.isEqual(incomingKeys, requiredProps)) {
+			logger.log('ERROR!', 'Missing one or more required body props', {params: _.difference(requiredProps, incomingKeys)});
+			return utils.sendJSONResponse(400, res, {error: 'Missing one or more required body props', params: _.difference(requiredProps, incomingKeys)});
+		}
+		logger.log('Create preference', 'Correct props passed.  Attempting to update db', {props: req.body});
+		return PreferenceModel.findOne({
+			where: { userId: userId }
+		});
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Could not fetch preference with user id', {error: err});
+		return utils.sendJSONResponse(500, res, {error: err});
+	}).then(function(prefs) {
+		let data = _.update(req.body, 'exclusions', function(item) { return JSON.parse(item) });
+		if (_.isUndefined(prefs)) {
+			throw new Error('User id fetch for preference update failed');
+		} else if (!prefs) {
+			logger.log('Create preference', 'No preference found for user.  Creating...', {});
+			return PreferenceModel.create(data);
+		} else {
+			logger.log('Create preference', 'Found a preference for user.  Updating...', prefs);
+			return prefs.update(data);
+		}
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Something went wrong with updating/creating a new preference', {error: err});
+		throw new Error('Something went wrong');
+	}).then(function(prefs) {
+		if (prefs) {
+			logger.log('Create preference', 'Successfully created/updated a new preference', {result: prefs});
+			return utils.sendJSONResponse(200, res, {prefs});
+		}
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Something went wrong while creating / updating preference for selected user', {error: err});
+		return utils.sendJSONResponse(500, res, {error: err});
+	});
+});
+
+router.get('/preferences', function(req, res, next) {
+	let session = utils.loggedIn(req, res);
+	if (!session) return;
+	const UserModel = new User(db);
+	const PreferenceModel = new Preference(db);
+	UserModel.findOne({where: { emailAddress: session.user }}).then(function(user) {
+		return user;
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Could not retrieve user for getting preferences', {error: err});
+		throw new Error('Could not retrieve user for getting preferences');
+	}).then(function(user) {
+		if (user) {
+			return PreferenceModel.findOne({where: { userId: user.id }});
+		}
+		throw new Error('No user was found.  Cannot fetch preferences');
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Could not retrieve preferences for user', {error: err});
+		throw new Error('Could not retrieve preferences for user');
+	}).then(function(prefs) {
+		if (prefs) {
+			logger.log('Fetch preferences', 'Successfully fetched preferences', prefs);
+			return utils.sendJSONResponse(200, res, prefs);
+		}
+		logger.log('Fetch preferences', 'No preferences found for target user', {});
+		return utils.sendJSONResponse(204, res, {});
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Something went wrong', {error: err});
+		return utils.sendJSONResponse(500, res, {error: err});
 	});
 });
 

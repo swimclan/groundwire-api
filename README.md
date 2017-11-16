@@ -2,7 +2,7 @@
 This is the Ground Wire trading API.  It uses RestFUL query paradigm and returns JSON responses.  It is a simple set of services that allow the consumer to set trades in Robinhood's (RH) free online trading brokerage.  There are currently methods that enable placing market orders, placing stop sell orders, checking current positions, cancelling stop sell orders (for the purpose of moving a sell position) and other basic infomation data from RH.  These services are intended to allow consumers to build automated trading clients that can manage day/swing trades in the market automatically.
 
 # Version
-1.18.1
+1.19.0
 <br>
 <em>See</em> [`CHANGELOG.md`](./CHANGELOG.md) <em>for more detailed view of all versions</em>
 
@@ -38,6 +38,27 @@ The API's service root is at `/v1/` and will run the expressJS app on port 3000.
 | `/v1/user/tokenize`    | GET         | None                              | Sets the Robinhood auth token in the db for Groundwire users sending Robinhood credentials to the api |
 | `/v1/strategy`         | GET         | None                              | Gets the current list of active strategies for the front end app |
 | `/v1/strategy`         | POST        | * `name` [string]                 | Creates a new strategy for front end consumption in preferences and sets it to active |
+| `/v1/preferences`      | POST        | * `<All required preference properties>` See below for details | Creates a new preference list for the logged in user (requires login) |
+| `/v1/preferences`      | GET         | None                              | Fetches the preference list for logged in user |
+
+## Preference properties
+Here is a list of all the required properties for the `/v1/preferences` POST route:
+
+```js
+  [
+    'c',
+    'stopMargin',
+    'minStop',
+    'maxSpread',
+    'strategy',
+    'profitLock',
+    'exclusions',
+    'screenerMax',
+    'screenerRanges',
+    'screenerFilters',
+    'active'
+  ]
+```
 
 ## Sample API Response
 Here is a sample JSON response that is returned from the GET `/api/price/<ticker>` method:

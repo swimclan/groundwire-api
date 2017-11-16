@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.19.0**                      | *Feature*    | Preferences routes for creating updating and fetching             |
 | **v1.18.1**                      | *Fix*        | Fixed bug in loggedIn utils check so it returns a valid session if successful |
 | **v1.18.0**                      | *Feature*    | Strategies table and api endpoint for getting and saving new strategies |
 | **v1.17.2**                      | *Update*     | Updated user check route to also check for valid robinhood token  |
