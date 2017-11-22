@@ -1,5 +1,6 @@
 | Version                          | Type         | Description                                                       |
 | -------------------------------- | -------------| ----------------------------------------------------------------- |
+| **v1.20.0**                      | *Feature*    | Robinhood account disconnect route                                |
 | **v1.19.0**                      | *Feature*    | Preferences routes for creating updating and fetching             |
 | **v1.18.1**                      | *Fix*        | Fixed bug in loggedIn utils check so it returns a valid session if successful |
 | **v1.18.0**                      | *Feature*    | Strategies table and api endpoint for getting and saving new strategies |

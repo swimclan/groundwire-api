@@ -18,7 +18,7 @@ let config = {
   },
   session: {
     cookie: {
-      expires: 3600000,
+      expires: 14 * 24 * 3600000,
       secure: false,
     }
   },

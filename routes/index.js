@@ -16,6 +16,8 @@ var User = require('../models/User');
 var Token = require('../models/Token');
 var Strategy = require('../models/Strategy');
 var Preference = require('../models/Preference');
+var config = require('../config');
+
 try {
 	var userCreds = require('../credentials/robinhood');
 } catch (e) {
@@ -27,6 +29,7 @@ let logger = Logger.getInstance();
 /* MIDDLEWARE */
 let bindUserSession = function(req, res, next) {
 	req.user = !_.isUndefined(userCreds) ? userCreds : utils.authenticatedUser(req);
+	if (!req.user) return res.status(401).send('Unauthorized.  No Robinhood authorization present in request');
 	var encodedUser = utils.encodeUser(req.user);
 	let session_destroy = Promise.resolve();
 	if (_.has(req.user, 'username') && _.has(req.user, 'password')) {
@@ -73,18 +76,6 @@ router.get('/user', bindUserSession, function(req, res, next) {
 	if (!utils.secure(req, res)) return;
 	trade.getUser(req.rh)
 	.then(function(user) {
-		utils.sendJSONResponse(200, res, user);
-	})
-	.catch(function(err) {
-		utils.sendJSONResponse(500, res, { error: err });
-	});
-});
-
-router.get('/logout', bindUserSession, function(req, res, next) {
-	if (!utils.secure(req, res)) return;
-	trade.expireUser(req.rh)
-	.then(function(user) {
-		req.app.locals.sessions.destroy(utils.encodeUser(user));
 		utils.sendJSONResponse(200, res, user);
 	})
 	.catch(function(err) {
@@ -487,7 +478,8 @@ router.get('/user/tokenize', bindUserSession, function(req, res, next) {
 		if (rhuser && rhuser.auth_token) {
 			return TokenModel.findCreateFind({
 				where: {
-					userId: userId
+					userId: userId,
+					active: true
 				},
 				defaults: {
 					authToken: rhuser.auth_token,
@@ -503,6 +495,7 @@ router.get('/user/tokenize', bindUserSession, function(req, res, next) {
 		if (token && created !== null && !_.isUndefined(created)) {
 			let prefix = created ? 'Created a new' : 'Found and updated a';
 			logger.log('Token', `${prefix} RH auth token for user: ${userId}`, {token: token});
+			res.cookie('rh_sid', token.authToken, { httpOnly: true, maxAge: config.get('session.cookie.expires') });
 			return utils.sendJSONResponse(200, res, {token: token});
 		}
 		return null
@@ -620,6 +613,47 @@ router.get('/preferences', function(req, res, next) {
 	}).catch(function(err) {
 		logger.log('ERROR!', 'Something went wrong', {error: err});
 		return utils.sendJSONResponse(500, res, {error: err});
+	});
+});
+
+router.get('/user/disconnect', bindUserSession, function(req, res, next) {
+	let session = utils.loggedIn(req, res);
+	if (!session) return;
+	let TokenModel = new Token(db);
+	let UserModel = new User(db);
+	logger.log('User disconnect', 'Attempting to disconnect user', {user: session.user});
+	Promise.all([
+		UserModel.findOne({where: {emailAddress: session.user}}),
+		trade.expireUser(req.rh)
+	]).then(function([user, rhuser]) {
+		if (user && rhuser) {
+			logger.log('User disconnect', 'Successfully retrieved user and expired token', {user: user.emailAddress, token: rhuser.token});
+			req.app.locals.sessions.destroy(utils.encodeUser(rhuser));
+			return TokenModel.findOne({where: {authToken: rhuser.token, userId: user.id}});
+		}
+		return null;
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Failed to retrieve user and expire token', {error: err});
+		utils.sendJSONResponse(500, res, {error: err});
+	}).then(function(token) {
+		if (token) {
+			logger.log('User disconnect', 'Successfully located token in db', {token: token.authToken, userId: token.userId});
+			token.active = false;
+			return token.save();
+		}
+		return null;
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Failed to locate token in db', {error: err});
+		utils.sendJSONResponse(500, res, {error: err});
+	}).then(function(result) {
+		if (result !== null) {
+			logger.log('User disconnect', 'Successfully set active state of token to false', {result: 'OK'});
+			return utils.sendJSONResponse(200, res, {result: 'OK', message: 'Disconnect successful'});
+		}
+		throw new Error('Failed to change token active status in db');
+	}).catch(function(err) {
+		logger.log('ERROR!', 'Something failed', {error: err});
+		return utils.sendJSONResponse(500, res, {error, err});
 	});
 });
 
