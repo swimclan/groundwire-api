@@ -413,6 +413,8 @@ router.get('/user/check', function(req, res, next) {
 	if (!valid_session) {
 		return utils.sendJSONResponse(200, res, ret);
 	}
+	let rh_cookie_sid = req.cookies.rh_sid;
+	logger.log('Connection cookie', 'Checking for a connection cookie with valid robinhood token', {rh_sid: rh_cookie_sid});
 	const TokenModel = new Token(db);
 	const UserModel = new User(db);
 	ret.authorized = true;
@@ -435,7 +437,7 @@ router.get('/user/check', function(req, res, next) {
 		logger.log('ERROR!', 'There was an error fetching user from the db', {error: err});
 	}).then((token) => {
 			logger.log('Token check', 'Token lookup complete.  Value of token is:', {token: token});
-			ret.connected = !_.isUndefined(token) && token !== null;
+			ret.connected = !_.isUndefined(token) && token !== null && token.authToken === rh_cookie_sid;
 			return utils.sendJSONResponse(200, res, ret);
 	}).catch((err) => {
 		logger.log('ERROR!', 'There was an error fetching token from the db', {error: err});
@@ -507,13 +509,13 @@ router.get('/user/tokenize', bindUserSession, function(req, res, next) {
 router.post('/strategy', function(req, res, next) {
 	if (!utils.secure(req, res)) return;
 	if (!utils.loggedIn(req, res)) return;
-	if (_.isUndefined(req.body.name)) {
-		logger.log('ERROR!', 'No strategy name was sent in the request.  Please try again.', {});
+	if (_.isUndefined(req.body.name) || _.isUndefined(req.body.title)) {
+		logger.log('ERROR!', 'No strategy name or title was sent in the request.  Please try again.', {});
 		return utils.sendJSONResponse(400, res, {error: 'No strategy name was sent in the request.  Please try again.'});
 	}
 	logger.log('Strategy create', 'About to create a new strategy', {name: req.body.name, active: true});
 	let StrategyModel = new Strategy(db);
-	StrategyModel.create({name: req.body.name, active: true}).then(function(strategy) {
+	StrategyModel.create({name: req.body.name, title: req.body.title, active: true}).then(function(strategy) {
 		logger.log('Strategy create', 'Strategy successfully created', strategy);
 		utils.sendJSONResponse(200, res, strategy);
 	}).catch(function(err) {
@@ -577,7 +579,7 @@ router.post('/preferences', function(req, res, next) {
 	}).then(function(prefs) {
 		if (prefs) {
 			logger.log('Create preference', 'Successfully created/updated a new preference', {result: prefs});
-			return utils.sendJSONResponse(200, res, {prefs});
+			return utils.sendJSONResponse(200, res, prefs);
 		}
 	}).catch(function(err) {
 		logger.log('ERROR!', 'Something went wrong while creating / updating preference for selected user', {error: err});

@@ -12,6 +12,9 @@ class Strategy extends Model {
       name: {
         type: Sequelize.STRING
       },
+      title: {
+        type: Sequelize.STRING
+      },
       active: {
         type: Sequelize.BOOLEAN
       }

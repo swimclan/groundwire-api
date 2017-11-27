@@ -29,6 +29,9 @@ class Preference extends Model {
           deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE
         }
       },
+      profitLockEnabled: {
+        type: Sequelize.BOOLEAN
+      },
       profitLock: {
         type: Sequelize.FLOAT
       },
